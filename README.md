@@ -19,3 +19,7 @@ Requirements:
 * https://unetbootin.github.io/ installed
 
 Download both from here https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-ubuntu-update-preparation.html
+
+## reset-usb.sh
+
+Needs to be run on the car to reset USB in the event of a failure of the front USB hub, faster than a full reboot of the car - works ~70% of the time

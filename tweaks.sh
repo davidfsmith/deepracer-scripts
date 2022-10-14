@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 backupDir=/home/deepracer/backup
 if [ ! -d ${backupDir} ]; then

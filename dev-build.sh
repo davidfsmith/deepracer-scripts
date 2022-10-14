@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # https://github.com/aws-deepracer/aws-deepracer-launcher/blob/main/getting-started.md
 

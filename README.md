@@ -7,7 +7,7 @@ Please note this scripts are provided as is.... if something breaks through you 
 Runs on the car from `/home/deepracer` and the intention is that can be used to test pull requests / dev code
 
     chmod +x dev-build.sh
-    sudo nohup ./dev-build.sh > ./dev-build.log
+    bash /dev-build.sh
 
 ## usb-build.sh
 

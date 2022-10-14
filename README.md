@@ -24,6 +24,9 @@ Download both from here https://docs.aws.amazon.com/deepracer/latest/developergu
 
 A script to change a couple of things on the car that I've found useful at events
 
+* Change the car console password (**Note:** Update the default password in the script)
+* Update Ubuntu
+* Update the car software
 * Disable IPV6 on network interfaces
 * Disable the video stream on the car console by default
 * Disable system suspend

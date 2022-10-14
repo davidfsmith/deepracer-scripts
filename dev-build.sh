@@ -2,12 +2,6 @@
 
 # https://github.com/aws-deepracer/aws-deepracer-launcher/blob/main/getting-started.md
 
-# Update the car
-sudo apt-get update
-
-# Update DeepRacer
-sudo apt-get install aws-deepracer-*
-
 # Install build tools
 sudo apt install python3-rosinstall
 
@@ -56,6 +50,9 @@ git fetch origin pull/3/head:fps
 git checkout fps
 
 cd ..
+
+# Install GPU drivers (dependancy for device-param PR)
+sudo /opt/intel/openvino_2021/install_dependencies/install_NEO_OCL_driver.sh
 
 # Make a backup
 sudo mv /opt/aws/deepracer/lib /opt/aws/deepracer/lib.orig

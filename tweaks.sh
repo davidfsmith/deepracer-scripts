@@ -5,8 +5,11 @@ if [ ! -d ${backupDir} ]; then
     mkdir ${backupDir}
 fi
 
-# Update
+# Update Ubuntu
 sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite"
+
+# Update DeepRacer
+sudo apt-get install aws-deepracer-*
 
 # Disable IPV6 on all interfaces
 cp /etc/sysctl.conf ${backupDir}/sysctl.conf.bak

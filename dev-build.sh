@@ -57,6 +57,9 @@ cd ..
 # Make a backup
 sudo mv /opt/aws/deepracer/lib /opt/aws/deepracer/lib.orig
 
+# Fix for aws-deepracer-launcher
+sudo apt-get install -y python3-websocket
+
 # Update deepracer_launcher.py
 cat > /home/deepracer/deepracer_ws/aws-deepracer-launcher/deepracer_launcher/launch/deepracer_launcher.py << EOF
 #################################################################################
@@ -244,3 +247,5 @@ sudo cp -Rp /opt/aws/deepracer/lib.orig/device_console /opt/aws/deepracer/lib/
 
 # Restart deepracer
 sudo systemctl restart deepracer-core
+
+echo "Done!"

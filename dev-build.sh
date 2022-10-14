@@ -12,7 +12,7 @@ sudo apt-get install aws-deepracer-*
 sudo apt install python3-rosinstall
 
 # Update ROS
-rosdep init
+sudo rosdep init
 sudo rosdep fix-permissions
 rosdep update
 
@@ -33,12 +33,15 @@ cd /home/deepracer/deepracer_ws
 # Get some code
 git clone https://github.com/aws-deepracer/aws-deepracer-launcher.git
 
+# Fix for aws-deepracer-launcher
+sudo apt-get install -y python3-websocket
+
 # Clone
 cd /home/deepracer/deepracer_ws/aws-deepracer-launcher && ./install_dependencies.sh
 
 # Unreleased dependancies
 cd /home/deepracer/deepracer_ws/aws-deepracer-launcher
-sudo rosws update
+rosws update
 
 # Resolve the dependanices
 cd /home/deepracer/deepracer_ws/aws-deepracer-launcher && rosdep install -i --from-path . --rosdistro foxy -y
@@ -56,9 +59,6 @@ cd ..
 
 # Make a backup
 sudo mv /opt/aws/deepracer/lib /opt/aws/deepracer/lib.orig
-
-# Fix for aws-deepracer-launcher
-sudo apt-get install -y python3-websocket
 
 # Update deepracer_launcher.py
 cat > /home/deepracer/deepracer_ws/aws-deepracer-launcher/deepracer_launcher/launch/deepracer_launcher.py << EOF

@@ -20,6 +20,19 @@ Requirements:
 
 Download both from here https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-ubuntu-update-preparation.html
 
+## tweaks.sh
+
+A script to change a couple of things on the car that I've found useful at events
+
+* Disable IPV6 on network interfaces
+* Disable the video stream on the car console by default
+* Disable system suspend
+* Disable network power saving
+* Enable SSH (You've probably already done this)
+* Allow multiple logins to the car console
+* Increase the car console cookie duration
+* Disable Gnome, Bluetooth & CUPS
+
 ## reset-usb.sh
 
 Needs to be run on the car to reset USB in the event of a failure of the front USB hub, faster than a full reboot of the car - works ~70% of the time

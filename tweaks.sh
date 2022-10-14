@@ -9,7 +9,17 @@ fi
 sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite"
 
 # Update DeepRacer
-sudo apt-get install aws-deepracer-*
+sudo apt-get install aws-deepracer-* -o Dpkg::Options::="--force-overwrite"
+
+# Set the car console password
+varPass="password"
+
+# Update the DeepRacer console password
+echo "Updating password to: $varPass"
+tempPass=$(echo -n $varPass | sha224sum)
+IFS=' ' read -ra encryptedPass <<< $tempPass
+cp /opt/aws/deepracer/password.txt ${backupDir}/password.txt.bak
+printf "${encryptedPass[0]}" > /opt/aws/deepracer/password.txt
 
 # Disable IPV6 on all interfaces
 cp /etc/sysctl.conf ${backupDir}/sysctl.conf.bak

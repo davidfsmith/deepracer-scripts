@@ -14,16 +14,19 @@ Runs on the car from `/home/deepracer` and the intention is that can be used to 
 (OSX only)
 
 Requirements:
-* `factory_reset.zip` unzipped in the same directory
-* `ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso` in the same directory
 * https://unetbootin.github.io/ installed
+* `factory_reset.zip` unzipped in the same directory (will be downloaded if missing)
+* `ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso` in the same directory (will be downloaded if missing)
 
 Download both from here https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-ubuntu-update-preparation.html
+
+    sudo ./usb-build.sh -d disk2
 
 ## tweaks.sh
 
 A script to change a couple of things on the car that I've found useful at events
 
+* Change the hostname
 * Change the car console password (**Note:** Update the default password in the script)
 * Update Ubuntu
 * Update the car software
@@ -31,10 +34,13 @@ A script to change a couple of things on the car that I've found useful at event
 * Disable the video stream on the car console by default
 * Disable system suspend
 * Disable network power saving
+* Disable the software update check
 * Enable SSH (You've probably already done this)
 * Allow multiple logins to the car console
 * Increase the car console cookie duration
 * Disable Gnome, Bluetooth & CUPS
+
+    sudo ./tweaks.sh -h newhostname -p magicpassword
 
 ## reset-usb.sh
 

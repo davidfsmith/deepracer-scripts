@@ -40,7 +40,12 @@ rosws update
 # Resolve the dependanices
 cd /home/deepracer/deepracer_ws/aws-deepracer-launcher && rosdep install -i --from-path . --rosdistro foxy -y
 
-# Update for PR's
+#######
+#
+# START - Pull request specific changes
+# 
+
+# Update packages for PR's
 cd /home/deepracer/deepracer_ws/aws-deepracer-launcher/aws-deepracer-inference-pkg
 git fetch origin pull/3/head:device-param
 git checkout device-param
@@ -51,13 +56,22 @@ git checkout fps
 
 cd ..
 
+# 
+# Dependencies for specific pull requests
+#
+
 # Install GPU drivers (dependancy for device-param PR)
 sudo /opt/intel/openvino_2021/install_dependencies/install_NEO_OCL_driver.sh
+
+#
+# END - Pull request specific changes
+#
+#######
 
 # Make a backup
 sudo mv /opt/aws/deepracer/lib /opt/aws/deepracer/lib.orig
 
-# Update deepracer_launcher.py
+# Update deepracer_launcher.py (fix an issue in the file)
 cat > /home/deepracer/deepracer_ws/aws-deepracer-launcher/deepracer_launcher/launch/deepracer_launcher.py << EOF
 #################################################################################
 #   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.          #

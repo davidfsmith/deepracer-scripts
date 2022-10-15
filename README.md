@@ -1,6 +1,6 @@
 # DeepRacer Scripts
 
-Please note this scripts are provided as is.... if something breaks through you using it then a) I'm sorry b) fix it and submit a PR ;-)
+Please note this scripts are provided as is.... if something breaks through use then a) I'm sorry b) fix it and submit a PR ;-)
 
 ## dev-build.sh
 
@@ -21,6 +21,8 @@ Requirements:
 Download both from here https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-ubuntu-update-preparation.html
 
     sudo ./usb-build.sh -d disk2
+
+**Note:** Should be updated to use the more generic dd
 
 ## tweaks.sh
 
@@ -44,4 +46,4 @@ A script to change a couple of things on the car that I've found useful at event
 
 ## reset-usb.sh
 
-Needs to be run on the car to reset USB in the event of a failure of the front USB hub, faster than a full reboot of the car - works ~70% of the time
+Needs to be run on the car to reset USB in the event of a failure of the front USB hub, faster than a full reboot of the car - works ~70% of the time YMMV

@@ -1,18 +1,46 @@
 #!/usr/bin/env bash
 
+#!/bin/bash
+
+usage()
+{
+    echo "Usage: sudo $0 -h HOSTNAME -p PASSWORD"
+    exit 0
+}
+
+# Check we have the privileges we need
+if [ `whoami` != root ]; then
+    echo "Please run this script as root or using sudo"
+    exit 0
+fi
+
+oldHost=NULL
+varHost=NULL
+varPass=NULL
+
 backupDir=/home/deepracer/backup
 if [ ! -d ${backupDir} ]; then
     mkdir ${backupDir}
 fi
 
-# Update Ubuntu
-sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite"
+optstring=":h:p:"
 
-# Update DeepRacer
-sudo apt-get install aws-deepracer-* -o Dpkg::Options::="--force-overwrite"
+while getopts $optstring arg; do
+    case ${arg} in
+        h) varHost=${OPTARG};;
+        p) varPass=${OPTARG};;
+        ?) usage ;;
+    esac
+done
 
-# Set the car console password
-varPass="password"
+if [ $OPTIND -eq 1 ]; then
+    echo "No options selected."
+    usage
+fi
+
+# Disable IPV6 on all interfaces
+cp /etc/sysctl.conf ${backupDir}/sysctl.conf.bak
+printf "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
 
 # Update the DeepRacer console password
 echo "Updating password to: $varPass"
@@ -20,10 +48,6 @@ tempPass=$(echo -n $varPass | sha224sum)
 IFS=' ' read -ra encryptedPass <<< $tempPass
 cp /opt/aws/deepracer/password.txt ${backupDir}/password.txt.bak
 printf "${encryptedPass[0]}" > /opt/aws/deepracer/password.txt
-
-# Disable IPV6 on all interfaces
-cp /etc/sysctl.conf ${backupDir}/sysctl.conf.bak
-printf "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
 
 # Check version
 . /etc/lsb-release
@@ -37,10 +61,43 @@ elif [ $DISTRIB_RELEASE = "20.04" ]; then
 
     bundlePath=/opt/aws/deepracer/lib/device_console/static
     webserverPath=/opt/aws/deepracer/lib/webserver_pkg/lib/python3.8/site-packages/webserver_pkg
+    systemPath=/opt/aws/deepracer/lib/deepracer_systems_pkg/lib/python3.8/site-packages/deepracer_systems_pkg
 
 else
     echo 'Not sure what version of OS, terminating.'
     exit 1
+fi
+
+echo 'Updating...'
+
+# Update Ubuntu
+sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite"
+
+# Update DeepRacer
+sudo apt-get install aws-deepracer-* -o Dpkg::Options::="--force-overwrite"
+
+# If changing hostname need to change the flag in network_config.py
+# /opt/aws/deepracer/lib/deepracer_systems_pkg/lib/python3.8/site-packages/deepracer_systems_pkg/network_monitor_module/network_config.py
+# SET_HOSTNAME_TO_CHASSIS_SERIAL_NUMBER = False
+if [ $DISTRIB_RELEASE = "20.04" ]; then
+    if [ $varHost != NULL ]; then
+        oldHost=$HOSTNAME
+        hostnamectl set-hostname ${varHost}
+        cp /etc/hosts ${backupDir}/hosts.bak
+        rm /etc/hosts
+        cat ${backupDir}/hosts.bak | sed -e "s/${oldHost}/${varHost}/" > /etc/hosts
+
+        cp ${systemPath}/network_monitor_module/network_config.py ${backupDir}/network_config.py.bak
+        rm ${systemPath}/network_monitor_module/network_config.py
+        cat ${backupDir}/network_config.py.bak | sed -e "s/SET_HOSTNAME_TO_CHASSIS_SERIAL_NUMBER = True/SET_HOSTNAME_TO_CHASSIS_SERIAL_NUMBER = False/" > ${systemPath}/network_monitor_module/network_config.py
+
+    fi
+
+    # Disable software_update
+    cp ${systemPath}/software_update_module/software_update_config.py ${backupDir}/software_update_config.py.bak
+    rm ${systemPath}/software_update_module/software_update_config.py
+    cat ${backupDir}/software_update_config.py.bak | sed -e "s/ENABLE_PERIODIC_SOFTWARE_UPDATE = True/ENABLE_PERIODIC_SOFTWARE_UPDATE = False/" > ${systemPath}/software_update_module/software_update_config.py
+
 fi
 
 # Disable video stream by default
@@ -116,6 +173,7 @@ systemctl stop cups-browsed
 #  [ + ]  whoopsie
 
 # Restart services
+echo 'Restarting services'
 systemctl restart deepracer-core
 service nginx restart
 

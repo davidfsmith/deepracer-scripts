@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [[ -f "$HOME/.bashrc" ]]; then
+    source $HOME/.bashrc
+fi
+
+source /opt/ros/foxy/setup.bash
+source /opt/intel/openvino/bin/setupvars.sh
+
+if [[ -f "./install/local_setup.bash" ]]; then
+    source ./install/local_setup.bash
+fi
+

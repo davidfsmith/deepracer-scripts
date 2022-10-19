@@ -2,3 +2,6 @@
 *.zip
 *.iso
 factory_reset*
+build/
+install/
+log/

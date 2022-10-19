@@ -70,3 +70,11 @@
     uri: https://github.com/aws-deepracer/aws-deepracer-launcher.git
     local-name: aws-deepracer-launcher
     version: main
+- git:
+    uri: https://github.com/larsll/larsll-deepracer-logging.git
+    local-name: larsll-deepracer-logging
+    version: main
+- git:
+    uri: https://github.com/ros2/rosbag2
+    local-name: rosbag2
+    version: foxy-future

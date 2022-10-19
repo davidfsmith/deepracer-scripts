@@ -25,5 +25,8 @@ sudo cp -Rp $(pwd)/ws/install /opt/aws/deepracer/lib
 echo "Copying console code"
 sudo cp -Rp /opt/aws/deepracer/lib.orig/device_console /opt/aws/deepracer/lib/
 
+# Create logs directory
+sudo mkdir -p /opt/aws/deepracer/logs
+
 # Restart deepracer
 sudo systemctl restart deepracer-core

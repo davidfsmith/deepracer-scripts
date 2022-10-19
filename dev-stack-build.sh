@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+cd ws
+
 rosws update
 
 # Resolve the dependanices
@@ -27,7 +29,7 @@ cd ..
 
 
 # Update deepracer_launcher.py (fix an issue in the file)
-cat > aws-deepracer-launcher/deepracer_launcher/launch/deepracer_launcher.py << EOF
+cat > ws/aws-deepracer-launcher/deepracer_launcher/launch/deepracer_launcher.py << EOF
 #################################################################################
 #   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.          #
 #                                                                               #
@@ -202,5 +204,7 @@ EOF
 
 # Build all the things
 colcon build --packages-up-to deepracer_launcher
+
+cd ..
 
 echo "Done!"

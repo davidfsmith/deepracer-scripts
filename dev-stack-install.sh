@@ -4,14 +4,25 @@
 sudo systemctl stop deepracer-core
 
 # Make a backup
-sudo mv /opt/aws/deepracer/lib /opt/aws/deepracer/lib.orig
+if [[ -d /opt/aws/deepracer/lib.orig ]]
+then
+    echo "Backup exists"
+    if [[ -d /opt/aws/deepracer/lib ]]
+    then
+        echo "Deleting current install"
+        sudo rm -rf /opt/aws/deepracer/lib
+    fi
+else
+    echo "Making backup"
+    sudo mv /opt/aws/deepracer/lib /opt/aws/deepracer/lib.orig
+fi
 
 # Symlink (or copy?) to the build
-# sudo ln -s /home/deepracer/deepracer_ws/aws-deepracer-launcher/install /opt/aws/deepracer/lib
+echo "Copy files"
 sudo cp -Rp $(pwd)/ws/install /opt/aws/deepracer/lib
 
 # Symlink (or copy?) in the console
-# sudo ln -s /opt/aws/deepracer/lib.orig/device_console  /opt/aws/deepracer/lib/device_console 
+echo "Copying console code"
 sudo cp -Rp /opt/aws/deepracer/lib.orig/device_console /opt/aws/deepracer/lib/
 
 # Restart deepracer

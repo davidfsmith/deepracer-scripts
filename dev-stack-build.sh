@@ -203,7 +203,7 @@ def generate_launch_description():
 EOF
 
 # Build all the things
-colcon build --packages-up-to deepracer_launcher
+colcon build --packages-up-to deepracer_launcher rplidar_ros2
 
 cd ..
 

@@ -49,6 +49,10 @@ IFS=' ' read -ra encryptedPass <<< $tempPass
 cp /opt/aws/deepracer/password.txt ${backupDir}/password.txt.bak
 printf "${encryptedPass[0]}" > /opt/aws/deepracer/password.txt
 
+# Grant deepracer user sudoers rights
+echo deepracer ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/deepracer
+chmod 0440 /etc/sudoers.d/deepracer
+
 # Check version
 . /etc/lsb-release
 if [ $DISTRIB_RELEASE = "16.04" ]; then

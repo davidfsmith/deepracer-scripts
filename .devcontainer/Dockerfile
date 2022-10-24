@@ -6,7 +6,7 @@ ARG USERNAME=user-name-goes-here
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     libboost-all-dev \
     python3-pip \
     ros-foxy-async-web-server-cpp \

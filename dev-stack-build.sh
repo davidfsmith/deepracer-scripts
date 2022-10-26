@@ -32,7 +32,6 @@ cd ..
 #
 #######
 
-
 # Update deepracer_launcher.py (fix an issue in the file)
 mkdir -p ws/aws-deepracer-launcher/deepracer_launcher/launch
 touch ws/aws-deepracer-launcher/deepracer_launcher/launch/deepracer_launcher.py

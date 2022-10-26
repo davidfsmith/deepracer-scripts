@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# Set the environment
+source /opt/ros/foxy/setup.bash 
+source /opt/intel/openvino_2021/bin/setupvars.sh
+
 cd ws
 
 rosws update

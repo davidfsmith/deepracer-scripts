@@ -1,0 +1,28 @@
+{
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "USERNAME": "${localEnv:USER}"
+        }
+    },
+    "containerUser": "${localEnv:USER}",
+    "containerEnv": {
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "QT_X11_NO_MITSHM": "1"
+    },
+    "extensions": ["ms-python.python","ms-vscode.cpptools-extension-pack"],
+    "runArgs":["--privileged","--network", "host"],
+    "mounts": [
+        "source=deepracer-ros-bashhistory,target=/commandhistory,type=volume",
+        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
+    ],
+    "settings": {
+        "terminal.integrated.profiles.linux": {
+            "bash (ROS)": {
+              "path": "/bin/bash",
+              "args": ["--init-file", ".devcontainer/bashrc"]
+            }
+          },
+          "terminal.integrated.defaultProfile.linux": "bash (ROS)"
+    }
+}

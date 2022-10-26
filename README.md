@@ -9,6 +9,16 @@ Runs on the car from `/home/deepracer` and the intention is that can be used to 
     chmod +x dev-build.sh
     bash /dev-build.sh
 
+## dev-stack-*
+
+Refactoring of the `dev-build.sh`, which splits it into three distinct scripts.
+
+| File | Description |
+|------|--------------|
+| `dev-stack-dependencies.sh` | Installs the dependencies for a custom DR stack. Script is only required to be run one time. |
+| `dev-stack-build.sh` | Downloads the packages defined in `ws/.rosinstall` and builds them into the `ws` folder. |
+| `dev-stack-install.sh` | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib`.
+
 ## usb-build.sh
 
 (OSX only)
@@ -24,7 +34,7 @@ Download both from here https://docs.aws.amazon.com/deepracer/latest/developergu
 
 **Note:** Should be updated to use the more generic dd
 
-## tweaks.sh
+## tweaks.sh
 
 A script to change a couple of things on the car that I've found useful at events
 
@@ -47,3 +57,11 @@ A script to change a couple of things on the car that I've found useful at event
 ## reset-usb.sh
 
 Needs to be run on the car to reset USB in the event of a failure of the front USB hub, faster than a full reboot of the car - works ~70% of the time YMMV
+
+## VS.Code Dev Container
+
+Files have been added to the repository (`.devcontainer` and `.vscode`) that allows the normal DR packages to be built on another machine, isolated from what is installed on the OS. Tested on Ubuntu 20.04.
+
+Container includes most relevant ROS2 Foxy packages, as well as the OpenVINO release that is used on the car.
+
+Before opening the container run `docker volume create deepracer-ros-bashhistory` to get your commandline history enabled inside the container.

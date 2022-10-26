@@ -215,5 +215,5 @@ colcon build --packages-up-to deepracer_launcher rplidar_ros2
 
 cd ..
 
-set -e
+set +e
 echo "Done!"

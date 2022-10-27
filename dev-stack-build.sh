@@ -37,7 +37,7 @@ cd ..
 rm -rf install build log
 
 # Update deepracer_launcher.py (fix an issue in the file)
-cat > aws-deepracer-launcher/deepracer_launcher/launch/deepracer_launcher.py << EOF
+cat > ./aws-deepracer-launcher/deepracer_launcher/launch/deepracer_launcher.py << EOF
 #################################################################################
 #   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.          #
 #                                                                               #

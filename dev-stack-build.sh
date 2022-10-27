@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 # Set the environment
 source /opt/ros/foxy/setup.bash 
 source /opt/intel/openvino_2021/bin/setupvars.sh
@@ -32,9 +33,11 @@ cd ..
 #
 #######
 
+# Remove previous builds (gives clean build)
+rm -rf install build log
 
 # Update deepracer_launcher.py (fix an issue in the file)
-cat > ws/aws-deepracer-launcher/deepracer_launcher/launch/deepracer_launcher.py << EOF
+cat > ./aws-deepracer-launcher/deepracer_launcher/launch/deepracer_launcher.py << EOF
 #################################################################################
 #   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.          #
 #                                                                               #
@@ -212,4 +215,5 @@ colcon build --packages-up-to deepracer_launcher rplidar_ros2
 
 cd ..
 
+set +e
 echo "Done!"

@@ -19,13 +19,23 @@ rosdep install -i --from-path . --rosdistro foxy -y
 
 # Update packages for PR's
 cd aws-deepracer-inference-pkg
-git fetch origin pull/3/head:device-param
-git checkout device-param
+git fetch origin pull/4/head:compressed-image
+git checkout compressed-image
 cd ..
 
 cd aws-deepracer-camera-pkg
-git fetch origin pull/3/head:fps
-git checkout fps
+git fetch origin pull/5/head:compressed-image
+git checkout compressed-image
+cd ..
+
+cd aws-deepracer-interfaces-pkg
+git fetch origin pull/4/head:compressed-image
+git checkout compressed-image
+cd ..
+
+cd aws-deepracer-sensor-fusion-pkg
+git fetch origin pull/4/head:compressed-image
+git checkout compressed-image
 cd ..
 
 #
@@ -156,7 +166,10 @@ def generate_launch_description():
         package='sensor_fusion_pkg',
         namespace='sensor_fusion_pkg',
         executable='sensor_fusion_node',
-        name='sensor_fusion_node'
+        name='sensor_fusion_node',
+        parameters=[{
+                'image_transport': 'compressed'
+            }]    
     )
     servo_node = Node(
         package='servo_pkg',

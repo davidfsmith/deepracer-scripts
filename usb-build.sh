@@ -29,7 +29,7 @@ if [ $OPTIND -eq 1 ]; then
 fi
 
 
-diskutil partitionDisk /dev/${disk} MBR fat32 BOOT 8gb exfat FLASH 16gb
+diskutil partitionDisk /dev/${disk} MBR fat32 BOOT 8gb exfat DEEPRACER 1gb exfat FLASH 15gb
 
 # Grab the zip -> https://s3.amazonaws.com/deepracer-public/factory-restore/Ubuntu20.04/BIOS-0.0.8/factory_reset.zip
 # Note if you have a smaller USB stick you'll need to unzip factory_reset.zip and copy the files across

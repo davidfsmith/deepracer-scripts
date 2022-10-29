@@ -28,7 +28,6 @@ if [ $OPTIND -eq 1 ]; then
     usage
 fi
 
-
 diskutil partitionDisk /dev/${disk} MBR fat32 BOOT 8gb exfat DEEPRACER 1gb exfat FLASH 15gb
 
 # Grab the zip -> https://s3.amazonaws.com/deepracer-public/factory-restore/Ubuntu20.04/BIOS-0.0.8/factory_reset.zip

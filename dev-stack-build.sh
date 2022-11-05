@@ -76,7 +76,7 @@ def generate_launch_description():
         executable='camera_node',
         name='camera_node',
         parameters=[
-            {'resize_images': True,
+            {'resize_images': False,
              'fps': 15}
         ]
     )
@@ -207,8 +207,11 @@ def generate_launch_description():
         executable='bag_log_node',
         name='bag_log_node',
         parameters=[{
-                'output_path': '/opt/aws/deepracer/logs/deepracer-bag-{}'
-            }]        
+                'output_path': '/opt/aws/deepracer/logs/deepracer-bag-{}',
+                'monitor_topic': '/deepracer_navigation_pkg/auto_drive',
+                'log_topics': ['/ctrl_pkg/servo_msg',
+                               '/inference_pkg/rl_results']
+                }]
     )    
     ld.add_action(camera_node)
     ld.add_action(ctrl_node)

@@ -19,13 +19,23 @@ rosdep install -i --from-path . --rosdistro foxy -y
 
 # Update packages for PR's
 cd aws-deepracer-inference-pkg
-git fetch origin pull/3/head:device-param
-git checkout device-param
+git fetch origin pull/4/head:compressed-image
+git checkout compressed-image
 cd ..
 
 cd aws-deepracer-camera-pkg
-git fetch origin pull/3/head:fps
-git checkout fps
+git fetch origin pull/5/head:compressed-image
+git checkout compressed-image
+cd ..
+
+cd aws-deepracer-interfaces-pkg
+git fetch origin pull/4/head:compressed-image
+git checkout compressed-image
+cd ..
+
+cd aws-deepracer-sensor-fusion-pkg
+git fetch origin pull/4/head:compressed-image
+git checkout compressed-image
 cd ..
 
 #
@@ -66,7 +76,7 @@ def generate_launch_description():
         executable='camera_node',
         name='camera_node',
         parameters=[
-            {'resize_images': True,
+            {'resize_images': False,
              'fps': 15}
         ]
     )
@@ -156,7 +166,10 @@ def generate_launch_description():
         package='sensor_fusion_pkg',
         namespace='sensor_fusion_pkg',
         executable='sensor_fusion_node',
-        name='sensor_fusion_node'
+        name='sensor_fusion_node',
+        parameters=[{
+                'image_transport': 'compressed'
+            }]    
     )
     servo_node = Node(
         package='servo_pkg',
@@ -188,6 +201,18 @@ def generate_launch_description():
         executable='web_video_server',
         name='web_video_server'
     )
+    bag_log_node = Node(
+        package='logging_pkg',
+        namespace='logging_pkg',
+        executable='bag_log_node',
+        name='bag_log_node',
+        parameters=[{
+                'output_path': '/opt/aws/deepracer/logs/deepracer-bag-{}',
+                'monitor_topic': '/deepracer_navigation_pkg/auto_drive',
+                'log_topics': ['/ctrl_pkg/servo_msg',
+                               '/inference_pkg/rl_results']
+                }]
+    )    
     ld.add_action(camera_node)
     ld.add_action(ctrl_node)
     ld.add_action(deepracer_navigation_node)
@@ -207,11 +232,15 @@ def generate_launch_description():
     ld.add_action(usb_monitor_node)
     ld.add_action(webserver_publisher_node)
     ld.add_action(web_video_server_node)
+    ld.add_action(bag_log_node)
     return ld
 EOF
 
-# Build all the things
+# Build the core
 colcon build --packages-up-to deepracer_launcher rplidar_ros2
+
+# Build the add-ons
+colcon build --packages-up-to logging_pkg 
 
 cd ..
 

@@ -40,7 +40,7 @@ rsync -av --progress factory_reset/* /Volumes/FLASH
 # Grab the ISO -> https://s3.amazonaws.com/deepracer-public/factory-restore/Ubuntu20.04/BIOS-0.0.8/ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso
 # Issues with OSX Ventura -> https://github.com/unetbootin/unetbootin/issues/337
 # https://github.com/unetbootin/unetbootin/wiki/commands
-sudo /Applications/unetbootin.app/Contents/MacOS/unetbootin method=diskimage isofile=ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso installtype=USB targetdrive=/dev/${disk}s1 autoinstall=yes
+# sudo /Applications/unetbootin.app/Contents/MacOS/unetbootin method=diskimage isofile=ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso installtype=USB targetdrive=/dev/${disk}s1 autoinstall=yes
 
 if [ ${ssid} != NULL ] && [ ${wifiPass} != NULL ]; then
 

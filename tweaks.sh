@@ -31,6 +31,9 @@ while getopts $optstring arg; do
     esac
 done
 
+# Stop DeepRacer Stack
+systemctl stop deepracer-core
+
 # Disable IPV6 on all interfaces
 cp /etc/sysctl.conf ${backupDir}/sysctl.conf.bak
 printf "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
@@ -67,7 +70,7 @@ echo 'Updating...'
 
 # Update Ubuntu
 sudo apt-get update
-sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite" -y
+sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::='--force-confold' -y
 
 # Update DeepRacer
 sudo apt-get install aws-deepracer-* -y
@@ -77,7 +80,7 @@ sudo apt-get update
 sudo apt-get upgrade -y
 
 # Remove redundant packages
-sudo apt autoremove
+sudo apt autoremove -y
 
 # If changing hostname need to change the flag in network_config.py
 # /opt/aws/deepracer/lib/deepracer_systems_pkg/lib/python3.8/site-packages/deepracer_systems_pkg/network_monitor_module/network_config.py
@@ -177,7 +180,7 @@ systemctl stop cups-browsed
 
 # Restart services
 echo 'Restarting services'
-systemctl restart deepracer-core
+systemctl start deepracer-core
 service nginx restart
 
 echo "Done!"

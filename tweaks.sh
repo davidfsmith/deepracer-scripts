@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-#!/bin/bash
-
 usage()
 {
     echo "Usage: sudo $0 -h HOSTNAME -p PASSWORD"
@@ -33,21 +31,18 @@ while getopts $optstring arg; do
     esac
 done
 
-if [ $OPTIND -eq 1 ]; then
-    echo "No options selected."
-    usage
-fi
-
 # Disable IPV6 on all interfaces
 cp /etc/sysctl.conf ${backupDir}/sysctl.conf.bak
 printf "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
 
 # Update the DeepRacer console password
-echo "Updating password to: $varPass"
-tempPass=$(echo -n $varPass | sha224sum)
-IFS=' ' read -ra encryptedPass <<< $tempPass
-cp /opt/aws/deepracer/password.txt ${backupDir}/password.txt.bak
-printf "${encryptedPass[0]}" > /opt/aws/deepracer/password.txt
+if [ $varPass != NULL ]; then
+    echo "Updating password to: $varPass"
+    tempPass=$(echo -n $varPass | sha224sum)
+    IFS=' ' read -ra encryptedPass <<< $tempPass
+    cp /opt/aws/deepracer/password.txt ${backupDir}/password.txt.bak
+    printf "${encryptedPass[0]}" > /opt/aws/deepracer/password.txt
+fi
 
 # Check version
 . /etc/lsb-release

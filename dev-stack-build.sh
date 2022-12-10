@@ -207,6 +207,7 @@ def generate_launch_description():
         executable='bag_log_node',
         name='bag_log_node',
         parameters=[{
+                'monitor_topic_timeout': 15,
                 'output_path': '/opt/aws/deepracer/logs/deepracer-bag-{}',
                 'monitor_topic': '/deepracer_navigation_pkg/auto_drive',
                 'log_topics': ['/ctrl_pkg/servo_msg',

@@ -2,15 +2,18 @@
 
 # https://github.com/aws-deepracer/aws-deepracer-launcher/blob/main/getting-started.md
 
+# Update Ubuntu
+sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite"
+
 # Install pre-requisites
-sudo apt-get install -y python3-websocket python3-colcon-common-extensions python3-rosinstall ros-foxy-compressed-image-transport
+sudo apt-get install -y python3-websocket python3-colcon-common-extensions python3-rosinstall
 
 # Set the environment
 source /opt/ros/foxy/setup.bash 
 source /opt/intel/openvino_2021/bin/setupvars.sh
 
-# Install GPU drivers (dependancy for device-param PR)
-sudo /opt/intel/openvino_2021/install_dependencies/install_NEO_OCL_driver.sh
+# Install GPU drivers (dependency for device-param PR)
+sudo /opt/intel/openvino_2021/install_dependencies/install_NEO_OCL_driver.sh -y
 
 # Update ROS
 sudo rosdep init

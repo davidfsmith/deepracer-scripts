@@ -9,9 +9,6 @@ cd ws
 
 rosws update
 
-# Resolve the dependanices
-rosdep install -i --from-path . --rosdistro foxy -y
-
 #######
 #
 # START - Pull request specific changes
@@ -37,6 +34,9 @@ cd aws-deepracer-sensor-fusion-pkg
 git fetch origin pull/4/head:compressed-image
 git checkout compressed-image
 cd ..
+
+# Resolve the dependanices
+rosdep install -i --from-path . --rosdistro foxy -y
 
 #
 # END - Pull request specific changes

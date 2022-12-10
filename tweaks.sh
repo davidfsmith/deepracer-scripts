@@ -66,10 +66,15 @@ fi
 echo 'Updating...'
 
 # Update Ubuntu
-sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite"
+sudo apt-get update
+sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite" -y
 
 # Update DeepRacer
-sudo apt-get install aws-deepracer-* -o Dpkg::Options::="--force-overwrite"
+sudo apt-get install aws-deepracer-* -y
+
+# Ensure all packages installed
+sudo apt-get update
+sudo apt-get upgrade -y
 
 # Remove redundant packages
 sudo apt autoremove

@@ -1,0 +1,80 @@
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-camera-pkg.git
+    local-name: aws-deepracer-camera-pkg
+    version: main
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-ctrl-pkg.git
+    local-name: aws-deepracer-ctrl-pkg
+    version: main
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-device-info-pkg.git
+    local-name: aws-deepracer-device-info-pkg
+    version: main
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-i2c-pkg.git
+    local-name: aws-deepracer-i2c-pkg
+    version: main
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-inference-pkg.git
+    local-name: aws-deepracer-inference-pkg
+    version: main
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-interfaces-pkg.git
+    local-name: aws-deepracer-interfaces-pkg
+    version: main
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-model-optimizer-pkg.git
+    local-name: aws-deepracer-model-optimizer-pkg
+    version: main
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-navigation-pkg.git
+    local-name: aws-deepracer-navigation-pkg
+    version: main
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-sensor-fusion-pkg.git
+    local-name: aws-deepracer-sensor-fusion-pkg
+    version: main
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-servo-pkg.git
+    local-name: aws-deepracer-servo-pkg
+    version: main
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-status-led-pkg.git
+    local-name: aws-deepracer-status-led-pkg
+    version: main
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-systems-pkg.git
+    local-name: aws-deepracer-systems-pkg
+    version: main
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-usb-monitor-pkg.git
+    local-name: aws-deepracer-usb-monitor-pkg
+    version: main
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-webserver-pkg.git
+    local-name: aws-deepracer-webserver-pkg
+    version: main
+- git:
+    uri: https://github.com/GT-RAIL/async_web_server_cpp.git
+    local-name: async_web_server_cpp
+    version: ros2
+- git:
+    uri: https://github.com/RobotWebTools/web_video_server.git
+    local-name: web_video_server
+    version: ros2
+- git:
+    uri: https://github.com/Slamtec/rplidar_ros.git
+    local-name: rplidar_ros
+    version: ros2
+- git:
+    uri: https://github.com/aws-deepracer/aws-deepracer-launcher.git
+    local-name: aws-deepracer-launcher
+    version: main
+- git:
+    uri: https://github.com/larsll/larsll-deepracer-logging.git
+    local-name: larsll-deepracer-logging
+    version: main
+- git:
+    uri: https://github.com/ros2/rosbag2
+    local-name: rosbag2
+    version: foxy-future

@@ -13,6 +13,8 @@ Runs on the car from `/home/deepracer` and the intention is that can be used to 
 
 Refactoring of the `dev-build.sh`, which splits it into three distinct scripts.
 
+To ensure that car configuration is correct, please run `tweaks.sh` once after flashing the car.
+
 | File | Description |
 |------|--------------|
 | `dev-stack-dependencies.sh` | Installs the dependencies for a custom DR stack. Script is only required to be run one time. |

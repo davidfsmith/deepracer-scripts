@@ -67,6 +67,7 @@ Additional switches:
 
 A script to change a couple of things on the car that I've found useful at events
 
+- Add `deepracer` user to `sudoers`
 - Change the hostname
 - Change the car console password (**Note:** Update the default password in the script)
 - Update Ubuntu

@@ -19,20 +19,50 @@ Refactoring of the `dev-build.sh`, which splits it into three distinct scripts.
 | `dev-stack-build.sh` | Downloads the packages defined in `ws/.rosinstall` and builds them into the `ws` folder. |
 | `dev-stack-install.sh` | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib`.
 
-## usb-build.sh
-
-(OSX only)
+## usb-build
 
 Requirements:
-* https://unetbootin.github.io/ installed
-* `factory_reset.zip` unzipped in the same directory (will be downloaded if missing)
+* `factory_reset.zip` unzipped in the same directory (will be downloaded and unzipped if missing)
 * `ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso` in the same directory (will be downloaded if missing)
 
-Download both from here https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-ubuntu-update-preparation.html
+Both files can be downloaded from here https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-ubuntu-update-preparation.html
 
-    sudo ./usb-build.sh -d disk2
+#### OSX version  
+
+Requirements:
+
+* https://unetbootin.github.io/ installed
+
+Command:
+
+```
+sudo ./usb-build.sh -d disk2
+```
 
 **Note:** Should be updated to use the more generic dd
+
+#### Windows PowerShell version
+
+Requirements:
+
+* Run in an Administrator / elevated mode PowerShell command window
+
+Command:
+
+```
+start powershell {.\usb-build.ps1 -DiskId <disk number>}
+```
+
+Additional switches:
+
+Description                                           | Switch
+------------------------------------------------------|---------------------------------------------------
+Provide Wifi Credentials                              | `-SSID <WIFI_SSID> -SSIDPassword <WIFI_PASSWORD>`
+Create partitions (default value is True)             | `-CreatePartition <True/False>`
+Ignore lock files (default value is False)            | `-IgnoreLock <True/False>`
+Create Factory Reset content (default value is False) | `-IgnoreFactoryReset <True/False>`
+Create Boot Drive (default value is False)            | `-IgnoreBootDrive <True/False>`
+
 
 ## tweaks.sh
 

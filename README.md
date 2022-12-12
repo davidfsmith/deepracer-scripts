@@ -21,8 +21,6 @@ To ensure that car configuration is correct, please run `tweaks.sh` once after f
 | `dev-stack-build.sh`        | Downloads the packages defined in `ws/.rosinstall` and builds them into the `ws` folder.     |
 | `dev-stack-install.sh`      | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib`.                      |
 
-## usb-build
-
 Requirements:
 
 - https://unetbootin.github.io/ installed
@@ -30,12 +28,6 @@ Requirements:
 - `ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso` in the same directory (will be downloaded if missing)
 
 Both files can be downloaded from here https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-ubuntu-update-preparation.html
-
-### OSX version
-
-Requirements:
-
-- https://unetbootin.github.io/ installed
 
 Command:
 

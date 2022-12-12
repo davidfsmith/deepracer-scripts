@@ -2,32 +2,31 @@
 
 Please note this scripts are provided as is.... if something breaks through use then a) I'm sorry b) fix it and submit a PR ;-)
 
-## dev-build.sh
-
-Runs on the car from `/home/deepracer` and the intention is that can be used to test pull requests / dev code
-
-    chmod +x dev-build.sh
-    bash /dev-build.sh
-
 ## dev-stack-\*
 
 Refactoring of the `dev-build.sh`, which splits it into three distinct scripts.
 
 To ensure that car configuration is correct, please run `tweaks.sh` once after flashing the car.
 
-| File                        | Description                                                                                  |
-| --------------------------- | -------------------------------------------------------------------------------------------- |
-| `dev-stack-dependencies.sh` | Installs the dependencies for a custom DR stack. Script is only required to be run one time. |
-| `dev-stack-build.sh`        | Downloads the packages defined in `ws/.rosinstall` and builds them into the `ws` folder.     |
-| `dev-stack-install.sh`      | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib`.                      |
+| -   | File                        | Description                                                                                  |
+| --- | --------------------------- | -------------------------------------------------------------------------------------------- |
+| 1   | `tweaks.sh`                 | Update the car settings.                                                                     |
+| 2   | `dev-stack-dependencies.sh` | Installs the dependencies for a custom DR stack. Script is only required to be run one time. |
+| 3   | `dev-stack-build.sh`        | Downloads the packages defined in `ws/.rosinstall` and builds them into the `ws` folder.     |
+| 4   | `dev-stack-install.sh`      | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib`.                      |
 
 Requirements:
 
-- https://unetbootin.github.io/ installed
 - `factory_reset.zip` unzipped in the same directory (will be downloaded and unzipped if missing)
 - `ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso` in the same directory (will be downloaded if missing)
 
 Both files can be downloaded from here https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-ubuntu-update-preparation.html
+
+### OSX version
+
+Requirements:
+
+- https://unetbootin.github.io/ installed
 
 Command:
 

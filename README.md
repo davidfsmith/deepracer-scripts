@@ -82,7 +82,11 @@ A script to change a couple of things on the car that I've found useful at event
 - Increase the car console cookie duration
 - Disable Gnome, Bluetooth & CUPS
 
-  sudo ./tweaks.sh -h newhostname -p magicpassword
+Command:
+
+```
+sudo ./tweaks.sh -h newhostname -p magicpassword
+```
 
 ## reset-usb.sh
 

@@ -2,7 +2,7 @@ Param (
     [string]$DiskId,
     [string]$SSID,
     [string]$SSIDPassword,
-    [string]$CreatePartition = $True,
+    [string]$CreatePartition = $True ,
     [string]$IgnoreLock = $False,
     [string]$IgnoreFactoryReset = $False,
     [string]$IgnoreBootDrive = $False
@@ -27,6 +27,8 @@ function Show-Usage {
     Write-Host "Usage: "
     Write-Host ""
     Write-Host "    .\$($scriptName) -DiskId <disk number> [ -SSID <WIFI_SSID> -SSIDPassword <WIFI_PASSWORD>]"
+    Write-Host ""
+    Write-Host " or if you want to start it in a separate window:"
     Write-Host ""
     Write-Host "    start powershell {.\$($scriptName) -DiskId <disk number> [ -SSID <WIFI_SSID> -SSIDPassword <WIFI_PASSWORD>]}"
 }
@@ -94,30 +96,6 @@ Function New-File-Download {
         }
     } else {
         Write-Host "  Download-File - File already downloaded, not donwloading $FilePath..."
-        # Write-Host "  Download-File - File already downloaded, checking if it's a newer version of $FilePath..."
-        # try {
-        #     #use HttpWebRequest to download file
-        #     $webRequest = [System.Net.HttpWebRequest]::Create($url);
-        #     $webRequest.IfModifiedSince = ([System.IO.FileInfo]$FilePath).LastWriteTime
-        #     $webRequest.Method = "GET";
-        #     [System.Net.HttpWebResponse]$webResponse = $webRequest.GetResponse()
-
-        #     #Read HTTP result from the $webResponse
-        #     $stream = New-Object System.IO.StreamReader($webResponse.GetResponseStream())
-        #     #Save to file
-        #     $stream.ReadToEnd() | Set-Content -Path $FilePath -Force 
-
-        # } catch [System.Net.WebException] {
-        #     #Check for a 304
-        #     if ($_.Exception.Response.StatusCode -eq [System.Net.HttpStatusCode]::NotModified) {
-        #         Write-Host "  Download-File - $FilePath not modified, not downloading..."
-        #     } else {
-        #         #Unexpected error
-        #         $Status = $_.Exception.Response.StatusCode
-        #         $msg = $_.Exception
-        #         Write-Host "  Download-File - Error dowloading $FilePath, Status code: $Status - $msg"
-        #     }
-        # }
     }
     $TimerEapsedTimeDownload = $(get-date) - $TimerStartTimeDownload
     $TimerTotalTimeDownload = "{0:HH:mm:ss}" -f ([datetime]$TimerEapsedTimeDownload.Ticks)
@@ -201,12 +179,16 @@ Function New-File-Transfer {
 }
 Function New-Timer {
     $TimerStartTime = $(get-date)
+    Write-Host ""
+    Write-Host "  -> Timer started: $TimerStartTime"
+    Write-Host ""	
 }
 Function Remove-Timer {
-    $TimerEapsedTime = $(get-date) - $TimerStartTime
+	$TimerStopTime = $(get-date)
+    $TimerEapsedTime = $TimerStopTime - $TimerStartTime
     $TimerTotalTime = "{0:HH:mm:ss}" -f ([datetime]$TimerEapsedTime.Ticks)
     Write-Host ""
-    Write-Host "  -> Elapsed time: $TimerTotalTime"
+    Write-Host "  -> Timer stopped: $TimerStopTime - Elapsed time: $TimerTotalTime"
     Write-Host ""
 }
 Function Set-Lock{
@@ -312,8 +294,11 @@ if($CreatePartition -eq $True) {
     New-Timer
 
     Set-Disk   -Number $($DiskNumber) -IsOffline $False
-    Clear-Disk -Number $($DiskNumber) -RemoveData -RemoveOEM -Confirm:$False  
-    
+    Clear-Disk -Number $($DiskNumber) -RemoveData -RemoveOEM -Confirm:$False
+	
+	Initialize-Disk -Number $DiskNumber -PartitionStyle "MBR" 2>$null
+	Get-Partition -DiskNumber $DiskNumber 2>$null | ForEach-Object {Remove-Partition -DiskNumber $DiskNumber -PartitionNumber $_.PartitionNumber -Confirm:$False 2>$null}
+	   
     New-Partition -DiskNumber $DiskNumber -Size 4GB       -IsActive | Format-Volume -FileSystem FAT32 -NewFileSystemLabel "BOOT"      -Confirm:$False 
     New-Partition -DiskNumber $DiskNumber -Size 2GB       -IsActive | Format-Volume -FileSystem FAT32 -NewFileSystemLabel "DEEPRACER" -Confirm:$False 
     New-Partition -DiskNumber $DiskNumber -UseMaximumSize -IsActive | Format-Volume -FileSystem EXFAT -NewFileSystemLabel "FLASH"     -Confirm:$False   
@@ -356,7 +341,7 @@ if($IgnoreFactoryReset -eq $False) {
     
     # uncomment `# reboot` on lines 520 & 528 of `usb_flash.sh`
     Copy-Item "$($AccessPathFLASH)/$($FactoryResetUSBFlashScriptPath)" -Destination "$($AccessPathFLASH)/$($FactoryResetUSBFlashScriptPath).bak"  -Recurse -Force -Verbose
-    (Get-Content "$($AccessPathFLASH)/$($FactoryResetUSBFlashScriptPath)").replace('#reboot', 'reboot') | Set-Content "$($AccessPathFLASH)/$($FactoryResetUSBFlashScriptPath)"
+    (Get-Content "$($AccessPathFLASH)/$($FactoryResetUSBFlashScriptPath)" -raw ).replace('#reboot', 'reboot') | Set-Content "$($AccessPathFLASH)/$($FactoryResetUSBFlashScriptPath)"
         
     Remove-Timer
 }

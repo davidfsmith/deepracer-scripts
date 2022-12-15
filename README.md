@@ -55,13 +55,13 @@ start powershell {.\usb-build.ps1 -DiskId <disk number>}
 
 Additional switches:
 
-Description                                           | Switch
-------------------------------------------------------|---------------------------------------------------
-Provide Wifi Credentials                              | `-SSID <WIFI_SSID> -SSIDPassword <WIFI_PASSWORD>`
-Create partitions (default value is True)             | `-CreatePartition <True/False>`
-Ignore lock files (default value is False)            | `-IgnoreLock <True/False>`
-Create Factory Reset content (default value is False) | `-IgnoreFactoryReset <True/False>`
-Create Boot Drive (default value is False)            | `-IgnoreBootDrive <True/False>`
+Description                                                    | Switch
+---------------------------------------------------------------|---------------------------------------------------
+Provide Wifi Credentials                                       | `-SSID <WIFI_SSID> -SSIDPassword <WIFI_PASSWORD>`
+Create partitions (default value is True)                      | `-CreatePartition <True/False>`
+Ignore lock files (default value is False)                     | `-IgnoreLock <True/False>`
+Ignore Factory Reset content creation (default value is False) | `-IgnoreFactoryReset <True/False>`
+Ignore Boot Drive creation (default value is False)            | `-IgnoreBootDrive <True/False>`
 
 
 ## tweaks.sh

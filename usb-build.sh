@@ -241,9 +241,9 @@ elif [[ $OSTYPE == 'linux'* ]]; then
             echo Y
         ) | sudo gdisk /dev/$disk | while read line ; do log " $line" ; done # > /dev/null 2>&1 
 	
-        sudo sgdisk -c 1:BOOT      /dev/$(echo $disk) 
-        sudo sgdisk -c 2:DEEPRACER /dev/$(echo $disk)
-        sudo sgdisk -c 3:FLASH     /dev/$(echo $disk)
+        sudo sgdisk -c 1:BOOT      /dev/$disk
+        sudo sgdisk -c 2:DEEPRACER /dev/$disk
+        sudo sgdisk -c 3:FLASH     /dev/$disk
         
         log "Informing the OS of partition table changes using partprobe..."
         sudo partprobe /dev/$disk # > /dev/null 2>&1 
@@ -298,8 +298,8 @@ elif [[ $OSTYPE == 'linux'* ]]; then
         # log "Changing ownership of factory_reset files in flash volume..."
         # sudo chown -fR $(id -u):$(id -g) $partition_flash
 
-        log "Synching the drive..."
-        sudo sync -f /dev/$disk
+        # log "Synching the drive..."
+        # sudo sync -f /dev/$disk
 
         log "Unmounting all existing partitions..."
         sudo ls /dev/$disk[1-99] 2> /dev/null | xargs -n1 sudo umount -l > /dev/null 2>&1 

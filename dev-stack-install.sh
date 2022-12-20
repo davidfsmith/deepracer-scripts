@@ -17,11 +17,11 @@ else
     sudo mv /opt/aws/deepracer/lib /opt/aws/deepracer/lib.orig
 fi
 
-# Symlink (or copy?) to the build
+# Copy the build
 echo "Copy files"
 sudo cp -Rp $(pwd)/ws/install /opt/aws/deepracer/lib
 
-# Symlink (or copy?) in the console
+# Copy in the console code
 echo "Copying console code"
 sudo cp -Rp /opt/aws/deepracer/lib.orig/device_console /opt/aws/deepracer/lib/
 

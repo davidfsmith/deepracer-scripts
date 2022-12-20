@@ -9,22 +9,15 @@ ARG USER_GID=$USER_UID
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     libboost-all-dev \
     python3-pip \
-    ros-foxy-async-web-server-cpp \
-    ros-foxy-image-transport \
-    ros-foxy-compressed-image-transport \
-    ros-foxy-imu-tools \
-    ros-foxy-tf-transformations \
     ros-foxy-cv-bridge \
-    ros-foxy-robot-localization \    
     ros-foxy-rqt-console \
     ros-foxy-rqt-graph \
-    ros-foxy-pybind11-vendor \
-    ros-foxy-test-msgs \
     libjsoncpp-dev \
     v4l-utils \
     ffmpeg \
     sudo \
-    curl
+    curl \
+    wget
 
 ARG build_id=2021.1.110
 # Install full package

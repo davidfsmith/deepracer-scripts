@@ -2,50 +2,50 @@
 
 Please note this scripts are provided as is.... if something breaks through use then a) I'm sorry b) fix it and submit a PR ;-)
 
-## dev-build.sh
-
-Runs on the car from `/home/deepracer` and the intention is that can be used to test pull requests / dev code
-
-    chmod +x dev-build.sh
-    bash /dev-build.sh
-
-## dev-stack-*
+## dev-stack-\*
 
 Refactoring of the `dev-build.sh`, which splits it into three distinct scripts.
 
-| File | Description |
-|------|--------------|
-| `dev-stack-dependencies.sh` | Installs the dependencies for a custom DR stack. Script is only required to be run one time. |
-| `dev-stack-build.sh` | Downloads the packages defined in `ws/.rosinstall` and builds them into the `ws` folder. |
-| `dev-stack-install.sh` | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib`.
+To ensure that car configuration is correct, please run `tweaks.sh` once after flashing the car.
 
-## usb-build
+| -   | File                        | Description                                                                                  |
+| --- | --------------------------- | -------------------------------------------------------------------------------------------- |
+| 1   | `tweaks.sh`                 | Update the car settings.                                                                     |
+| 2   | `dev-stack-dependencies.sh` | Installs the dependencies for a custom DR stack. Script is only required to be run one time. |
+| 3   | `dev-stack-build.sh`        | Downloads the packages defined in `ws/.rosinstall` and builds them into the `ws` folder.     |
+| 4   | `dev-stack-install.sh`      | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib`.                      |
 
 Requirements:
-* `factory_reset.zip` unzipped in the same directory (will be downloaded and unzipped if missing)
-* `ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso` in the same directory (will be downloaded if missing)
+
+- `factory_reset.zip` unzipped in the same directory (will be downloaded and unzipped if missing)
+- `ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso` in the same directory (will be downloaded if missing)
 
 Both files can be downloaded from here https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-ubuntu-update-preparation.html
 
-#### OSX version  
+### OSX version
 
 Requirements:
 
-* https://unetbootin.github.io/ installed
+- https://unetbootin.github.io/ installed
 
 Command:
 
 ```
-sudo ./usb-build.sh -d disk2
+./usb-build.sh -d disk2 -s <WIFI_SSID> -W <WIFI_PASSWORD>
 ```
 
-**Note:** Should be updated to use the more generic dd
+The wifi credentials are used to create `wifi-creds.txt` on the `DEEPRACER` partition, upon rebooting after flashing the car will use this file to connect to wifi
 
-#### Windows PowerShell version
+**Note:**
+
+- Tested and working on Intel and Apple based Macs
+- Unetbootin currently doesn't work on OSX Ventura [#Issue 337](https://github.com/unetbootin/unetbootin/issues/337)
+
+### Windows PowerShell version
 
 Requirements:
 
-* Run in an Administrator / elevated mode PowerShell command window
+- Run in an Administrator / elevated mode PowerShell command window
 
 Command:
 
@@ -63,26 +63,30 @@ Ignore lock files (default value is False)                     | `-IgnoreLock <T
 Ignore Factory Reset content creation (default value is False) | `-IgnoreFactoryReset <True/False>`
 Ignore Boot Drive creation (default value is False)            | `-IgnoreBootDrive <True/False>`
 
-
 ## tweaks.sh
 
 A script to change a couple of things on the car that I've found useful at events
 
-* Change the hostname
-* Change the car console password (**Note:** Update the default password in the script)
-* Update Ubuntu
-* Update the car software
-* Disable IPV6 on network interfaces
-* Disable the video stream on the car console by default
-* Disable system suspend
-* Disable network power saving
-* Disable the software update check
-* Enable SSH (You've probably already done this)
-* Allow multiple logins to the car console
-* Increase the car console cookie duration
-* Disable Gnome, Bluetooth & CUPS
+- Add `deepracer` user to `sudoers`
+- Change the hostname
+- Change the car console password (**Note:** Update the default password in the script)
+- Update Ubuntu
+- Update the car software
+- Disable IPV6 on network interfaces
+- Disable the video stream on the car console by default
+- Disable system suspend
+- Disable network power saving
+- Disable the software update check
+- Enable SSH (You've probably already done this)
+- Allow multiple logins to the car console
+- Increase the car console cookie duration
+- Disable Gnome, Bluetooth & CUPS
 
-    sudo ./tweaks.sh -h newhostname -p magicpassword
+Command:
+
+```
+sudo ./tweaks.sh -h newhostname -p magicpassword
+```
 
 ## reset-usb.sh
 

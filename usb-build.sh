@@ -32,12 +32,12 @@ donwload_file()
     
     log "Checking if ${file_name} has been downloaded..."
     if [ ! -f ${file_name} ]; then
-            log "   --> downloading ${file_name}"
-            # curl -O ${url}
-            wget -O ${file_name}.tmp ${url} && mv ${file_name}{.tmp,}
-            log exit code $? 
+        log "   --> downloading ${file_name}"
+        # curl -O ${url}
+        wget -O ${file_name}.tmp ${url} && mv ${file_name}{.tmp,}
+        log exit code $? 
     else
-            log "   --> ${file_name} is already present"
+        log "   --> ${file_name} is already present"
     fi
 }
 

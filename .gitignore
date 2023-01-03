@@ -5,3 +5,4 @@
 factory_reset*
 ws/*
 !ws/.rosinstall
+mkusb-min

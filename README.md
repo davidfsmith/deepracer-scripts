@@ -15,6 +15,9 @@ To ensure that car configuration is correct, please run `tweaks.sh` once after f
 | 3   | `dev-stack-build.sh`        | Downloads the packages defined in `ws/.rosinstall` and builds them into the `ws` folder.     |
 | 4   | `dev-stack-install.sh`      | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib`.                      |
 
+
+## usb-build.*
+
 Requirements:
 
 - `factory_reset.zip` unzipped in the same directory (will be downloaded and unzipped if missing)
@@ -34,12 +37,29 @@ Command:
 ./usb-build.sh -d disk2 -s <WIFI_SSID> -W <WIFI_PASSWORD>
 ```
 
-The wifi credentials are used to create `wifi-creds.txt` on the `DEEPRACER` partition, upon rebooting after flashing the car will use this file to connect to wifi
+**Note:**
+
+- The wifi credentials are used to create `wifi-creds.txt` on the `DEEPRACER` partition, upon rebooting after flashing the car will use this file to connect to wifi
+- Tested and working on Intel and Apple based Macs
+- Unetbootin currently doesn't work on OSX Ventura [#Issue 337](https://github.com/unetbootin/unetbootin/issues/337)
+
+### Ubuntu version
+
+Requirements:
+
+- requires sudo privileges
+- will add you to sudoer automatically (with no password)
+
+Command:
+
+```
+./usb-build.ubuntu.sh -d disk2 -s <WIFI_SSID> -W <WIFI_PASSWORD>
+```
 
 **Note:**
 
-- Tested and working on Intel and Apple based Macs
-- Unetbootin currently doesn't work on OSX Ventura [#Issue 337](https://github.com/unetbootin/unetbootin/issues/337)
+- The wifi credentials are used to create `wifi-creds.txt` on the `DEEPRACER` partition, upon rebooting after flashing the car will use this file to connect to wifi
+- Tested and working on Ubuntu 20.0.4 (like a DeepRacer car)
 
 ### Windows PowerShell version
 
@@ -62,6 +82,12 @@ Create partitions (default value is True)                      | `-CreatePartiti
 Ignore lock files (default value is False)                     | `-IgnoreLock <True/False>`
 Ignore Factory Reset content creation (default value is False) | `-IgnoreFactoryReset <True/False>`
 Ignore Boot Drive creation (default value is False)            | `-IgnoreBootDrive <True/False>`
+
+**Note:**
+
+- The wifi credentials are used to create `wifi-creds.txt` on the `DEEPRACER` partition, upon rebooting after flashing the car will use this file to connect to wifi
+- Tested and working on Windows 11 Pro
+
 
 ## tweaks.sh
 

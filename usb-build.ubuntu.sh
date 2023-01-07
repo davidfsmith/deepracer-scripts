@@ -27,7 +27,14 @@ show_usage()
 {
     log "Usage: "
     log ""
-    log "    $0 -d <disk id> [ -s SSID -w WIFI_PASSWORD]"
+    log "    $0 (-d <disk id> | -a) [ -s <SSID> -w <WIFI_PASSWORD>] [-l]"
+    log ""
+    log "    -d <disk id>       : selected usb device id on which the content will be created (required if -a is not used)"
+    log "    -a                 : select all usb device id (required if -d is not used)"
+    log "    -s <SSID>          : wifi ssid (optional, but requires -w when used)"
+    log "    -w <WIFI_PASSWORD> : wifi password(optional, but requires -s when used)"
+    log "    -l                 : ignore lock file (optional)"
+
     log ""
 }
 show_disk()

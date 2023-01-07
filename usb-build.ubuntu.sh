@@ -66,6 +66,13 @@ else
 fi
 
 if [ "$all_disks" = "true" ]; then
+    disk_cnt=$(lsblk -o name,tran | grep usb | cut -d' ' -f1 | wc -l)
+    
+    if [ "$disk_cnt" -eq 0 ]; then
+        log "Unable to find disk devices! Exiting..."
+        exit 1
+    fi
+
     log "You selected to execute the script on all attached USB drives below."
 
     show_disk

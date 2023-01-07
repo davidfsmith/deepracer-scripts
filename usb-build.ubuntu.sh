@@ -46,117 +46,6 @@ show_disk()
     log  ""
 }
 
-while getopts $optstring arg; do
-    case ${arg} in
-        a) all_disks=true;;
-        l) ignore_lock=true;;
-        d) disk=${OPTARG};;
-        s) ssid=${OPTARG};;
-        w) wifiPass=${OPTARG};;
-        ?) show_usage ;;
-    esac
-done
-
-if [ $OPTIND -eq 1 ]; then
-    log "No options selected."
-    show_usage
-    exit 1
-fi
-
-# check if you are running ubuntu, and if not exit
-if [  -n "$(uname -a | grep Ubuntu)" ]; then
-   log "Detected Ubuntu system"
-else
-   log "Detected a non Ubuntu system"
-   log "  -> Unfortunately this script is only compatible with Ubuntu like systems"
-   exit 0   
-fi
-
-if [ "$all_disks" = "true" ]; then
-    disk_cnt=$(lsblk -o name,tran | grep usb | cut -d' ' -f1 | wc -l)
-    
-    if [ "$disk_cnt" -eq 0 ]; then
-        log "Unable to find disk devices! Exiting..."
-        exit 1
-    fi
-
-    log "You selected to execute the script on all attached USB drives below."
-
-    show_disk
-
-    log "Are you sure ? (y/n)"
-
-    while true; do
-        read -p "" yn
-        case $yn in
-            [Yy]* ) break;;
-            [Nn]* ) exit 0;;
-            * ) log "Please answer yes/y or no/n.";;
-        esac
-    done
-    
-    trap 'kill $(jobs -pr) 2>/dev/null' SIGINT SIGTERM EXIT
-
-    while IFS= read -r result
-    do
-        log "Starting USB Build script for USB device $result"
-        arg_wifi="-s $ssid -w $wifiPass"
-        if [[ -z "$ssid" ]]; then
-            arg_wifi=""
-        else 
-            arg_wifi="-s $ssid -w $wifiPass"
-        fi
-        if [ "$ignore_lock" = "true" ]; then
-            arg_ignore_lock="-l"
-        else
-            arg_ignore_lock=""
-        fi
-
-        $0 -d $result $arg_wifi $arg_ignore_lock &
-        pids="$pids $!"
-    done < <(lsblk -o name,tran | grep usb | cut -d' ' -f1 )
-
-    RESULT=0
-    for pid in $pids; do
-        wait $pid || let "RESULT=1"
-    done
-
-    if [ "$RESULT" == "0" ]; then
-        log "Execution completed without issues."
-    else
-        log "One of the execition failed. Please check the logs."
-    fi
-    exit 0
-fi
-
-# check sudo permission, and add to sudoer with no password if not there yet
-sudo_response=$(SUDO_ASKPASS=/bin/false sudo -A whoami 2>&1 | wc -l)
-if [ $sudo_response = 2 ]; then
-    can_sudo=1
-elif [ $sudo_response = 1 ]; then
-    can_sudo=0
-else
-    log "Unexpected sudo response: $sudo_response" >&2
-    exit 1
-fi
-
-if [[ "$EUID" != 0 ]]; then
-    sudo -k # make sure to ask for password on next sudo
-    if sudo true; then
-        sudo_ok=1        
-        sudoer_user_file="/etc/sudoers.d/dont-prompt-$USER-for-sudo-password"
-        if [ ! -f "$sudoer_user_file" ]; then
-            log "Adding current user to sudoers nopasswd list"
-            echo "$USER ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee $sudoer_user_file > /dev/null 2>&1 
-        fi     
-
-    else
-        log "Please provide the sudo password"
-        exit 1
-    fi
-fi
-
-
 lock_set()
 {
     log "Adding a lock file to prevent paralel execution"
@@ -175,6 +64,7 @@ lock_set()
         fi
     fi
 }
+
 lock_remove()
 {
     lock_file_path="$PWD/$0.lck.$disk"
@@ -291,10 +181,122 @@ mount_partitions()
     sudo mount /dev/$(echo $disk)2   $mnt_deepracer > /dev/null 2>&1
     sudo mount /dev/$(echo $disk)3   $mnt_flash     > /dev/null 2>&1
 }
+
 unmount_partitions()
 {
     sudo ls /dev/$disk[1-99] 2> /dev/null | xargs -n1 sudo umount -l > /dev/null 2>&1 
 }
+
+
+while getopts $optstring arg; do
+    case ${arg} in
+        a) all_disks=true;;
+        l) ignore_lock=true;;
+        d) disk=${OPTARG};;
+        s) ssid=${OPTARG};;
+        w) wifiPass=${OPTARG};;
+        ?) show_usage ;;
+    esac
+done
+
+if [ $OPTIND -eq 1 ]; then
+    log "No options selected."
+    show_usage
+    exit 1
+fi
+
+# check if you are running ubuntu, and if not exit
+if [  -n "$(uname -a | grep Ubuntu)" ]; then
+   log "Detected Ubuntu system"
+else
+   log "Detected a non Ubuntu system"
+   log "  -> Unfortunately this script is only compatible with Ubuntu like systems"
+   exit 0   
+fi
+
+if [ "$all_disks" = "true" ]; then
+    disk_cnt=$(lsblk -o name,tran | grep usb | cut -d' ' -f1 | wc -l)
+    
+    if [ "$disk_cnt" -eq 0 ]; then
+        log "Unable to find disk devices! Exiting..."
+        exit 1
+    fi
+
+    log "You selected to execute the script on all attached USB drives below."
+
+    show_disk
+
+    log "Are you sure ? (y/n)"
+
+    while true; do
+        read -p "" yn
+        case $yn in
+            [Yy]* ) break;;
+            [Nn]* ) exit 0;;
+            * ) log "Please answer yes/y or no/n.";;
+        esac
+    done
+    
+    trap 'kill $(jobs -pr) 2>/dev/null' SIGINT SIGTERM EXIT
+
+    while IFS= read -r result
+    do
+        log "Starting USB Build script for USB device $result"
+        arg_wifi="-s $ssid -w $wifiPass"
+        if [[ -z "$ssid" ]]; then
+            arg_wifi=""
+        else 
+            arg_wifi="-s $ssid -w $wifiPass"
+        fi
+        if [ "$ignore_lock" = "true" ]; then
+            arg_ignore_lock="-l"
+        else
+            arg_ignore_lock=""
+        fi
+
+        $0 -d $result $arg_wifi $arg_ignore_lock &
+        pids="$pids $!"
+    done < <(lsblk -o name,tran | grep usb | cut -d' ' -f1 )
+
+    RESULT=0
+    for pid in $pids; do
+        wait $pid || let "RESULT=1"
+    done
+
+    if [ "$RESULT" == "0" ]; then
+        log "Execution completed without issues."
+    else
+        log "One of the execition failed. Please check the logs."
+    fi
+    exit 0
+fi
+
+# check sudo permission, and add to sudoer with no password if not there yet
+sudo_response=$(SUDO_ASKPASS=/bin/false sudo -A whoami 2>&1 | wc -l)
+if [ $sudo_response = 2 ]; then
+    can_sudo=1
+elif [ $sudo_response = 1 ]; then
+    can_sudo=0
+else
+    log "Unexpected sudo response: $sudo_response" >&2
+    exit 1
+fi
+
+if [[ "$EUID" != 0 ]]; then
+    sudo -k # make sure to ask for password on next sudo
+    if sudo true; then
+        sudo_ok=1        
+        sudoer_user_file="/etc/sudoers.d/dont-prompt-$USER-for-sudo-password"
+        if [ ! -f "$sudoer_user_file" ]; then
+            log "Adding current user to sudoers nopasswd list"
+            echo "$USER ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee $sudoer_user_file > /dev/null 2>&1 
+        fi     
+
+    else
+        log "Please provide the sudo password"
+        exit 1
+    fi
+fi
 
 # check if the device exists and its size, must be bigger than 25GB
 get_usb_device_size $disk

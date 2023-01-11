@@ -18,7 +18,11 @@ To ensure that car configuration is correct, please run `tweaks.sh` once after f
 
 ## usb-build.*
 
-Requirements:
+**Recommendations**:
+
+- Try using USB 3.0 usb stick, the process will take about 30 minutes per stick compared to 1.5hrs with USB 2.0 ones.
+
+**Requirements**:
 
 - `factory_reset.zip` unzipped in the same directory (will be downloaded and unzipped if missing)
 - `ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso` in the same directory (will be downloaded if missing)
@@ -27,11 +31,11 @@ Both files can be downloaded from here https://docs.aws.amazon.com/deepracer/lat
 
 ### OSX version
 
-Requirements:
+**Requirements**:
 
 - https://unetbootin.github.io/ installed
 
-Command:
+**Command**:
 
 ```
 ./usb-build.sh -d disk2 -s <WIFI_SSID> -W <WIFI_PASSWORD>
@@ -45,15 +49,15 @@ Command:
 
 ### Ubuntu version
 
-Requirements:
+**Requirements**:
 
-- requires sudo privileges
-- will add you to sudoer automatically (with no password)
+- Requires sudo privileges
+- Will add current user to sudoer automatically (with the "no password" option enabled)
 
-Command:
+**Command**:
 
 ```
-./usb-build.ubuntu.sh -d disk2 -s <WIFI_SSID> -W <WIFI_PASSWORD>
+./usb-build.ubuntu.sh -d sdX -s <WIFI_SSID> -W <WIFI_PASSWORD>
 ```
 
 **Note:**
@@ -63,11 +67,11 @@ Command:
 
 ### Windows PowerShell version
 
-Requirements:
+**Requirements**:
 
 - Run in an Administrator / elevated mode PowerShell command window
 
-Command:
+**Command**:
 
 ```
 start powershell {.\usb-build.ps1 -DiskId <disk number>}

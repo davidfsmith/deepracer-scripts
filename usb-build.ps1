@@ -113,7 +113,7 @@ Function New-Partition-Path{
     Write-Host "  New-Partition-Path - Adding new partition path for DiskNumber $DiskNumber PartitionNumber $PartitionNumber AccessPath $AccessPath"
     Write-Host ""
     New-Item -ItemType Directory -Force -Confirm:$False -Path $AccessPath | Out-Null
-    Add-PartitionAccessPath   -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber  -AccessPath $AccessPath
+    Add-PartitionAccessPath -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber -AccessPath $AccessPath
     
 }
 Function New-Partition-Drive{
@@ -168,7 +168,7 @@ Function New-File-Transfer {
             Write-Host "  Transfer-File - Using BitTransfer method"
             Start-BitsTransfer -Source "$path_src/$file_src" -Destination $path_dst
         } else {
-            Copy-Item -Path "$path_src/$file_src" -Destination $path_dst -Recurse -Force -Verbose
+            Copy-Item -Path "$path_src/$file_src" -Destination $path_dst -Recurse -Force
         }
     } else {
         Write-Host "  Transfer-File - File already exists, not transfering..."
@@ -296,12 +296,18 @@ if($CreatePartition -eq $True) {
     Set-Disk   -Number $($DiskNumber) -IsOffline $False
     Clear-Disk -Number $($DiskNumber) -RemoveData -RemoveOEM -Confirm:$False
 	
+((@"
+select disk $DiskNumber
+clean
+"@
+)|diskpart)  2>$null >$null
+
 	Initialize-Disk -Number $DiskNumber -PartitionStyle "MBR" 2>$null
 	Get-Partition -DiskNumber $DiskNumber 2>$null | ForEach-Object {Remove-Partition -DiskNumber $DiskNumber -PartitionNumber $_.PartitionNumber -Confirm:$False 2>$null}
 	   
-    New-Partition -DiskNumber $DiskNumber -Size 4GB       -IsActive | Format-Volume -FileSystem FAT32 -NewFileSystemLabel "BOOT"      -Confirm:$False 
-    New-Partition -DiskNumber $DiskNumber -Size 2GB       -IsActive | Format-Volume -FileSystem FAT32 -NewFileSystemLabel "DEEPRACER" -Confirm:$False 
-    New-Partition -DiskNumber $DiskNumber -UseMaximumSize -IsActive | Format-Volume -FileSystem EXFAT -NewFileSystemLabel "FLASH"     -Confirm:$False   
+    New-Partition -DiskNumber $DiskNumber -Size 4GB   -IsActive | Format-Volume -FileSystem FAT32 -NewFileSystemLabel "BOOT"      -Confirm:$False 
+    New-Partition -DiskNumber $DiskNumber -Size 1GB   -IsActive | Format-Volume -FileSystem FAT32 -NewFileSystemLabel "DEEPRACER" -Confirm:$False 
+    New-Partition -DiskNumber $DiskNumber -Size 20GB  -IsActive | Format-Volume -FileSystem EXFAT -NewFileSystemLabel "FLASH"     -Confirm:$False   
 
     Remove-Timer
 }
@@ -340,7 +346,7 @@ if($IgnoreFactoryReset -eq $False) {
     New-Timer
     
     # uncomment `# reboot` on lines 520 & 528 of `usb_flash.sh`
-    Copy-Item "$($AccessPathFLASH)/$($FactoryResetUSBFlashScriptPath)" -Destination "$($AccessPathFLASH)/$($FactoryResetUSBFlashScriptPath).bak"  -Recurse -Force -Verbose
+    Copy-Item "$($AccessPathFLASH)/$($FactoryResetUSBFlashScriptPath)" -Destination "$($AccessPathFLASH)/$($FactoryResetUSBFlashScriptPath).bak" -Recurse -Force
     (Get-Content "$($AccessPathFLASH)/$($FactoryResetUSBFlashScriptPath)" -raw ).replace('#reboot', 'reboot') | Set-Content "$($AccessPathFLASH)/$($FactoryResetUSBFlashScriptPath)"
         
     Remove-Timer
@@ -384,7 +390,7 @@ if( $IgnoreBootDrive -eq $False) {
         bootsect.exe /nt60 "$($AccessPathBOOT)"    
     }
 
-    Copy-Item -Path "$($DiskLetter):\*" -Destination "$($AccessPathBOOT)" -Recurse -Force -Verbose
+    Copy-Item -Path "$($DiskLetter):\*" -Destination "$($AccessPathBOOT)" -Recurse -Force
 
     $LockFileCount = (Get-ChildItem -Path $ENV:Temp -filter "$($scriptName).lck.*" | Measure-Object -Property Directory).Count    
 

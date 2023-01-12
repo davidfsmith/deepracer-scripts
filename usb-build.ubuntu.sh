@@ -219,6 +219,26 @@ unmount_dr_iso()
     fi
   
 }
+check_packages(){
+    need_install=false
+    packages=$(echo {mtools,exfat-utils,parted,pv,dosfstools,syslinux})        
+    for package in $packages ; do
+        dpkg-query -W -f='${Package}\n' | grep ^$package$ > /dev/null
+        if [ $? != 0 ] ; then
+            need_install=true
+        fi
+    done  
+    if [ "$need_install" = "true" ]; then
+        log "  -> Installing additional packages ..."
+        # sudo add-apt-repository ppa:mkusb/ppa -y 2>&1 | while read line ; do log "  --> $line" ; done # > /dev/null
+        sudo apt                update        -y 2>&1 | while read line ; do log "  --> $line" ; done # > /dev/null
+        for package in $packages ; do
+            sudo apt-get --ignore-missing -o DPkg::Lock::Timeout=-1 install $package -y -qq 2>&1 | while read line ; do log "  --> $line" ; done # > /dev/null
+        done  
+    else
+        log "  -> All additional packages are already installed..."
+    fi
+}
 #################################################################
 process_all(){
     disk_cnt=$(lsblk -o name,tran | grep usb | cut -d' ' -f1 | wc -l)
@@ -334,28 +354,7 @@ process(){
     lock_set
 
     log "Checking if required packages are installed ..."
-    need_install=false
-    packages=$(echo {mtools,exfat-utils,parted,pv,dosfstools,syslinux})        
-    check_packages () {
-        for package in $packages ; do
-            dpkg-query -W -f='${Package}\n' | grep ^$package$ > /dev/null
-            if [ $? != 0 ] ; then
-                need_install=true
-            fi
-        done  
-    }
     check_packages
-    if [ "$need_install" = "true" ]; then
-        log "  -> Installing additional packages ..."
-    
-        sudo add-apt-repository ppa:mkusb/ppa -y 2>&1 | while read line ; do log "  --> $line" ; done # > /dev/null
-        sudo apt                update        -y 2>&1 | while read line ; do log "  --> $line" ; done # > /dev/null
-        for package in $packages ; do
-            sudo apt-get --ignore-missing -o DPkg::Lock::Timeout=-1 install $package -y -qq 2>&1 | while read line ; do log "  --> $line" ; done # > /dev/null
-        done  
-    else
-        log "  -> All additional packages are already installed..."
-    fi
 
     log "Unmounting device existing partitions ..."
     unmount_partitions

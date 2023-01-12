@@ -372,14 +372,10 @@ process(){
     mount_dr_iso
         
     log "Generating the FLASH partition content using rsync with factory_reset ..."
-    sudo rsync -rDvz --out-format="[%t][pid=$$][disk=$disk]  --> %-100n (size: %''l)" --progress --human-readable --exclude dlrc_image_21WW09.5_tpm.img                 factory_reset/* $mnt_flash 2>&1 # | while read line ; do log "  --> $line" ; done 
-    # sudo rsync -rapDvz --out-format="[%t][pid=$$][disk=$disk]  --> %-100n (size: %''l)" --progress --human-readable factory_reset/* $mnt_flash 2>&1 # | while read line ; do log "  --> $line" ; done 
-
+    sudo rsync -rDvz --out-format="[%t][pid=$$][disk=$disk]  --> %-100n (size: %''l)" --progress --human-readable                  factory_reset/* $mnt_flash 2>&1 # | while read line ; do log "  --> $line" ; done 
+    
     log "Generating the BOOT partition content using rsync with the ubuntu iso ..."
-    sudo rsync -rDvz --out-format="[%t][pid=$$][disk=$disk]  --> %-100n (size: %''l)" --progress --human-readable --exclude ubuntu --exclude filesystem.squashfs $mnt_iso/* $mnt_boot 2>&1 # | while read line ; do log "  --> $line" ; done 
-    #rkltDvz
-    # --exclude ubuntu 
-    # --exclude filesystem.squashfs --exclude pool --exclude isolinux
+    sudo rsync -rlkDvz --out-format="[%t][pid=$$][disk=$disk]  --> %-100n (size: %''l)" --progress --human-readable --exclude ubuntu $mnt_iso/* $mnt_boot 2>&1 # | while read line ; do log "  --> $line" ; done 
 
     # Create wifi-creds.txt for auto network goodness
     if [ ! -z "$ssid" ] && [ ! -z "$wifiPass" ]; then
@@ -396,11 +392,11 @@ process(){
     sudo lsblk /dev/$disk -o name,fstype,label,size,mountpoint,partflags,partlabel 2>&1 | while read line ; do log "  --> $line" ; done 
 
     log "Unmounting device partitions ..."
-    # unmount_partitions
-    # unmount_dr_iso
+    unmount_partitions
+    unmount_dr_iso
 
     log "Ejecting the disk ..."
-    # sudo eject /dev/$disk
+    sudo eject /dev/$disk
 
     usb=$(find /sys/bus/usb/devices/usb*/ -name dev | grep "/$disk/dev")
     log "You can now remove your device : "
@@ -411,7 +407,6 @@ process(){
     lock_remove 
 }
 #################################################################
-
 
 # check if you are running ubuntu or macos darwin, and if not exit
 if [[ $OSTYPE == 'linux'* ]]; then

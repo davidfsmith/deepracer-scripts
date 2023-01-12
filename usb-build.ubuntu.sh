@@ -58,8 +58,7 @@ donwload_file()
     log "Checking if ${file_name} has been downloaded ..."
     if [ ! -f ${file_name} ]; then
         log "  --> downloading ${file_name}"
-        # curl -O ${url}
-        wget -O ${file_name}.tmp ${url} && mv ${file_name}{.tmp,}
+        wget -q -O ${file_name}.tmp ${url} 2>&1 | while read line ; do log "  --> $line" ; done  && mv ${file_name}{.tmp,} 2>&1 | while read line ; do log "  --> $line" ; done 
         log exit code $? 
     else
         log "  --> ${file_name} is already present"
@@ -149,16 +148,19 @@ get_usb_device_size()
 }
 create_partitions()
 {
-    sudo parted /dev/$disk -s -a optimal -- mktable msdos                      2>&1 | while read line ; do log "  --> $line" ; done
-    sudo parted /dev/$disk -s -a optimal -- mkpart primary fat32 1MiB 4GiB     2>&1 | while read line ; do log "  --> $line" ; done
-    sudo parted /dev/$disk -s -a optimal -- mkpart primary fat32 4GiB 5GiB     2>&1 | while read line ; do log "  --> $line" ; done
-    sudo parted /dev/$disk -s -a optimal -- mkpart primary fat32 5GiB 25GiB    2>&1 | while read line ; do log "  --> $line" ; done
+    sudo parted /dev/$disk -s -a optimal -- mktable msdos mklabel msdos                                  2>&1 | while read line ; do log "  --> $line" ; done
+    sudo parted /dev/$disk -s -a optimal -- mkpart primary fat32 1MiB 4GiB   2>&1 | while read line ; do log "  --> $line" ; done
+    sudo parted /dev/$disk -s -a optimal -- mkpart primary fat32 4GiB 5GiB   2>&1 | while read line ; do log "  --> $line" ; done
+    sudo parted /dev/$disk -s -a optimal -- mkpart primary NTFS  5GiB 25GiB  2>&1 | while read line ; do log "  --> $line" ; done
+
+    sudo parted /dev/$disk set 1 boot on 2>&1 | while read line ; do log "  --> $line" ; done
+
 }
 format_partitions()
 {
-    sudo mkfs.vfat    /dev/$(echo $disk)1 -n "BOOT"        2>&1 | while read line ; do log "  --> [dev/$(echo $disk)1] $line" ; done 
-    sudo mkfs.vfat    /dev/$(echo $disk)2 -n "DEEPRACER"   2>&1 | while read line ; do log "  --> [dev/$(echo $disk)2] $line" ; done 
-    sudo mkfs.exfat   /dev/$(echo $disk)3 -n "FLASH"       2>&1 | while read line ; do log "  --> [dev/$(echo $disk)3] $line" ; done 
+    sudo mkfs.vfat   /dev/$(echo $disk)1 -n "BOOT"        2>&1 | while read line ; do log "  --> [dev/$(echo $disk)1] $line" ; done 
+    sudo mkfs.vfat   /dev/$(echo $disk)2 -n "DEEPRACER"   2>&1 | while read line ; do log "  --> [dev/$(echo $disk)2] $line" ; done 
+    sudo mkfs.exfat  /dev/$(echo $disk)3 -n "FLASH"       2>&1 | while read line ; do log "  --> [dev/$(echo $disk)3] $line" ; done 
 }
 mount_partitions()
 {
@@ -190,7 +192,7 @@ mount_dr_iso()
         log "  --> not mounted, mounting ${url_iso##*/} at $mnt_iso"
         sudo rm   -rf $mnt_iso      > /dev/null 2>&1
         sudo mkdir -p $mnt_iso      > /dev/null 2>&1
-        sudo mount ${url_iso##*/}   $mnt_iso      > /dev/null 2>&1
+        sudo mount -o loop ${url_iso##*/}   $mnt_iso      > /dev/null 2>&1
     else
         log "  --> already mounted, skipping $is_mounted"
     fi    
@@ -209,11 +211,11 @@ unmount_dr_iso()
         while true; do
             read -p "" yn
             case $yn in
-                [Yy]* ) log "  --> unmounting"; sudo mount ${url_iso##*/}   $mnt_iso      > /dev/null 2>&1;break;;
+                [Yy]* ) log "  --> unmounting"; sudo umount ${url_iso##*/} ; sudo rm -rf $mnt_iso ; break;;
                 [Nn]* ) log "  --> exiting without unmounting";break;;
                 * ) log "Please answer yes/y or no/n.";;
             esac
-        done          
+        done
     fi
   
 }
@@ -331,13 +333,29 @@ process(){
 
     lock_set
 
-    log "Installing additional packages ..."
-    sudo apt-get --ignore-missing -o DPkg::Lock::Timeout=-1 install \
-        mtools \
-        exfat-utils \
-        parted \
-        pv \
-        dosfstools  -y -qq | while read line ; do log "  --> $line" ; done # > /dev/null
+    log "Checking if required packages are installed ..."
+    need_install=false
+    packages=$(echo {mtools,exfat-utils,parted,pv,dosfstools,syslinux})        
+    check_packages () {
+        for package in $packages ; do
+            dpkg-query -W -f='${Package}\n' | grep ^$package$ > /dev/null
+            if [ $? != 0 ] ; then
+                need_install=true
+            fi
+        done  
+    }
+    check_packages
+    if [ "$need_install" = "true" ]; then
+        log "  -> Installing additional packages ..."
+    
+        sudo add-apt-repository ppa:mkusb/ppa -y 2>&1 | while read line ; do log "  --> $line" ; done # > /dev/null
+        sudo apt                update        -y 2>&1 | while read line ; do log "  --> $line" ; done # > /dev/null
+        for package in $packages ; do
+            sudo apt-get --ignore-missing -o DPkg::Lock::Timeout=-1 install $package -y -qq 2>&1 | while read line ; do log "  --> $line" ; done # > /dev/null
+        done  
+    else
+        log "  -> All additional packages are already installed..."
+    fi
 
     log "Unmounting device existing partitions ..."
     unmount_partitions
@@ -353,7 +371,7 @@ process(){
     log "Informing the OS of partition table changes using partprobe ..."
     sudo partprobe /dev/$disk 2>&1 | while read line ; do log "  --> $line" ; done 
 
-    if ! sudo mkfs.vfat   /dev/$(echo $disk)1 > /dev/null 2>&1  ; then
+    if ! sudo mkfs.vfat /dev/$(echo $disk)1 > /dev/null 2>&1  ; then
         log "Unable to use to format the partitions."
         log "Consider using a different USB port or retry in little while."
         log "Exiting ..."
@@ -372,10 +390,11 @@ process(){
     mount_dr_iso
         
     log "Generating the FLASH partition content using rsync with factory_reset ..."
-    sudo rsync -rDvz --out-format="[%t][pid=$$][disk=$disk]  --> %-100n (size: %''l)" --progress --human-readable                  factory_reset/* $mnt_flash 2>&1 # | while read line ; do log "  --> $line" ; done 
+    sudo rsync -rDvz   --out-format="[%t][pid=$$][disk=$disk]  --> %n (size: %''l)" --progress --human-readable                  factory_reset/* $mnt_flash 2>&1 # | while read line ; do log "  --> $line" ; done 
     
     log "Generating the BOOT partition content using rsync with the ubuntu iso ..."
-    sudo rsync -rlkDvz --out-format="[%t][pid=$$][disk=$disk]  --> %-100n (size: %''l)" --progress --human-readable --exclude ubuntu $mnt_iso/* $mnt_boot 2>&1 # | while read line ; do log "  --> $line" ; done 
+    sudo cp -TRP $mnt_iso $mnt_boot 2>&1 | while read line ; do log "  --> $line" ; done 
+    sudo sync
 
     # Create wifi-creds.txt for auto network goodness
     if [ ! -z "$ssid" ] && [ ! -z "$wifiPass" ]; then

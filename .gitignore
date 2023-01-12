@@ -1,6 +1,8 @@
 .DS_Store
 *.zip
 *.iso
+*.exe
+*.lck.*
 factory_reset*
 ws/*
 !ws/.rosinstall

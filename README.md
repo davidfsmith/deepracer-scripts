@@ -38,7 +38,7 @@ Both files can be downloaded from here https://docs.aws.amazon.com/deepracer/lat
 **Command**:
 
 ```
-./usb-build.sh -d disk2 -s <WIFI_SSID> -W <WIFI_PASSWORD>
+./usb-build.sh -d disk2 -s <WIFI_SSID> -w <WIFI_PASSWORD>
 ```
 
 **Note:**

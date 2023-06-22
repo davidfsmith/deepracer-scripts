@@ -69,7 +69,7 @@ Both files can be downloaded from here https://docs.aws.amazon.com/deepracer/lat
 
 **Requirements**:
 
-- Run in an Administrator / elevated mode PowerShell command window
+- Run in PowerShell command window (**NOT** run as Administrator, but you will be prompted to elevate with Administrator at some point in the script=
 
 **Command**:
 

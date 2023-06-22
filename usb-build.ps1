@@ -5,11 +5,20 @@ Param (
     [string]$CreatePartition = $True ,
     [string]$IgnoreLock = $False,
     [string]$IgnoreFactoryReset = $False,
-    [string]$IgnoreBootDrive = $False
-
+    [string]$IgnoreBootDrive = $False,
+    [string]$SkipDownload = $False,
+	[string]$CurrentDirectory  
 )
 $scriptName = Split-Path -leaf $PSCommandpath
-$LockFilePath = $ENV:Temp + "\$($scriptName).lck"
+if ( $CurrentDirectory -eq "" ) {
+	$CurrentDirectory = Get-Location
+}
+If (-not ( Test-Path("$($CurrentDirectory)"))) {
+	$CurrentDirectory = Get-Location
+}
+Write-Host "CurrentDirectory  $CurrentDirectory "
+
+$LockFilePath = $CurrentDirectory + "\$($scriptName).lck"
 
 $TimerStartTime = $(get-date)
 
@@ -60,7 +69,7 @@ Function New-File-Unzip {
     # Check if the destination directory exists so we don't need to download
     If ( -not ( Test-Path("$($directory)") ) ) { 
         Write-Host "  Unzip-File - $($directory) folder doesn't exists, extracting..."
-        Expand-Archive $FileName -DestinationPath "$(Get-Location)\"
+        Expand-Archive $FileName -DestinationPath "$($CurrentDirectory)\"
     } else {
         Write-Host "  Unzip-File - $FileName folder already extracted, not extracting..."
     }
@@ -75,7 +84,7 @@ Function New-File-Download {
     $TimerStartTimeDownload = $(get-date)
 
     Write-Host "  Download-File - Processing url : $url"
-    $FilePath = "$(Get-Location)\$($url.ToString().Substring($url.ToString().LastIndexOf("/") + 1))"
+    $FilePath = "$($CurrentDirectory)\$($url.ToString().Substring($url.ToString().LastIndexOf("/") + 1))"
 
     # Make sure the destination directory exists
     # System.IO.FileInfo works even if the file/dir doesn't exist, which is better then get-item which requires the file to exist
@@ -195,7 +204,7 @@ Function Set-Lock{
     Param (
         [Parameter(Mandatory=$True)] [string]$DiskId
     )    
-    $LockFilePath = $ENV:Temp + "\$($scriptName).lck.$($DiskId)"
+    $LockFilePath = $CurrentDirectory + "\$($scriptName).lck.$($DiskId)"
 
     If ( -not ( Test-Path("$($LockFilePath)") ) ) { 
         Write-Host "  Set-Lock - Lock file doesn't exists, creating..."
@@ -216,7 +225,7 @@ Function Remove-Lock{
 
     Write-Host "  Remove-Lock - Checking lock file content..."
 
-    $LockFilePath = $ENV:Temp + "\$($scriptName).lck.$($DiskId)"
+    $LockFilePath = $CurrentDirectory + "\$($scriptName).lck.$($DiskId)"
 
     If ( Test-Path("$($LockFilePath)") ) { 
         Write-Host "  Remove-Lock - Removing lock file for Disk Id $($DiskId)..."
@@ -259,22 +268,42 @@ if(($DiskNumber.PartitionStyle -eq "RAW")) {
     Initialize-Disk -Number $DiskNumber -PartitionStyle MBR -Confirm:$False  
 }
 
-Write-Host ""
-Write-Host "Downloading required files..."
-Write-Host ""
+if($SkipDownload -eq $False) {
+	Write-Host ""
+	Write-Host "Downloading required files..."
+	Write-Host ""
 
-New-Timer
+	New-Timer
 
-New-File-Download -url $ISOFileUrl
-New-File-Download -url $FactoryResetUrl
+	New-File-Download -url $ISOFileUrl
+	New-File-Download -url $FactoryResetUrl
 
-Remove-Timer
+	Remove-Timer
 
-Write-Host ""
-Write-Host "Unzipping required files..."
-Write-Host ""
+	Write-Host ""
+	Write-Host "Unzipping required files..."
+	Write-Host ""
 
-New-File-Unzip -FileName $FactoryResetUrlFileName
+	New-File-Unzip -FileName $FactoryResetUrlFileName
+}
+
+function Pass-Parameters {
+    Param ([hashtable]$NamedParameters)
+    return ($NamedParameters.GetEnumerator()|%{"-$($_.Key) `"$($_.Value)`""}) -join " "
+}
+
+# Self-elevate the script if required
+if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
+	if ([int](Get-CimInstance -Class Win32_OperatingSystem | Select-Object -ExpandProperty BuildNumber) -ge 6000) {
+		$MyInvocation.BoundParameters["CurrentDirectory"] = $CurrentDirectory
+		$CommandLine = "-NoExit -File `"" + $MyInvocation.MyCommand.Path + "`" " + (Pass-Parameters $MyInvocation.BoundParameters) + " " + $MyInvocation.UnboundArguments + " -SkipDownload True "
+		Start-Process -FilePath PowerShell.exe -Verb Runas -ArgumentList $CommandLine
+		Exit
+	}
+}
+
+# Remainder of script here
+
 
 $PartitionNumberBOOT = 1
 $PartitionNumberDEEPRACER = 2
@@ -282,9 +311,9 @@ $PartitionNumberFLASH = 3
 
 $uuid = [guid]::NewGuid().ToString()
 
-$AccessPathDEEPRACER = $($ENV:Temp) + "\AP_DEEPRACER-$($uuid)"
-$AccessPathFLASH     = $($ENV:Temp) + "\AP_FLASH-$($uuid)"
-$AccessPathBOOT      = $($ENV:Temp) + "\AP_BOOT-$($uuid)"
+$AccessPathDEEPRACER = $($CurrentDirectory) + "\AP_DEEPRACER-$($uuid)"
+$AccessPathFLASH     = $($CurrentDirectory) + "\AP_FLASH-$($uuid)"
+$AccessPathBOOT      = $($CurrentDirectory) + "\AP_BOOT-$($uuid)"
 
 if($CreatePartition -eq $True) {
     Write-Host ""
@@ -333,7 +362,7 @@ if($IgnoreFactoryReset -eq $False) {
     
     # Copy-Item -Path ".\factory_reset\*" -Destination "$($AccessPathFLASH)" -Recurse -Force -Verbose
 
-    Get-ChildItem ".\factory_reset\*" | ForEach-Object {
+    Get-ChildItem "$($CurrentDirectory)\factory_reset\*" | ForEach-Object {
         New-File-Transfer -path_src (Split-Path -Path $_.FullName) -file_src $_.Name -path_dst $AccessPathFLASH
     }
 
@@ -375,13 +404,13 @@ if( $IgnoreBootDrive -eq $False) {
 
     New-Timer
 
-    if((Get-DiskImage -ImagePath "$(Get-Location)\$($ISOFileName)").Attached -eq $False) {
+    if((Get-DiskImage -ImagePath "$($CurrentDirectory)\$($ISOFileName)").Attached -eq $False) {
         Write-Host "  $($ISOFileName) is not mounted yet, mounting..."
-        $DiskImage  = Mount-DiskImage -ImagePath "$(Get-Location)\$($ISOFileName)"
+        $DiskImage  = Mount-DiskImage -ImagePath "$($CurrentDirectory)\$($ISOFileName)"
         $DiskLetter = ($DiskImage | Get-Volume).DriveLetter
     } else {
         Write-Host "  $($ISOFileName) already mounted, reusing..."
-        $DiskImage  = (Get-DiskImage -ImagePath "$(Get-Location)\$($ISOFileName)")
+        $DiskImage  = (Get-DiskImage -ImagePath "$($CurrentDirectory)\$($ISOFileName)")
         $DiskLetter = ($DiskImage | Get-Volume).DriveLetter
     }
     
@@ -392,16 +421,16 @@ if( $IgnoreBootDrive -eq $False) {
 
     Copy-Item -Path "$($DiskLetter):\*" -Destination "$($AccessPathBOOT)" -Recurse -Force
 
-    $LockFileCount = (Get-ChildItem -Path $ENV:Temp -filter "$($scriptName).lck.*" | Measure-Object -Property Directory).Count    
+    $LockFileCount = (Get-ChildItem -Path $CurrentDirectory -filter "$($scriptName).lck.*" | Measure-Object -Property Directory).Count    
 
     if ($LockFileCount -eq 0) {
         Write-Host "  No more process in progress, unmounting $($ISOFileName)..."
-        Dismount-DiskImage -ImagePath "$(Get-Location)\$($ISOFileName)"
+        Dismount-DiskImage -ImagePath "$($CurrentDirectory)\$($ISOFileName)"
     } else {
         Write-Host "  There are processes in progress, cannot unmount $($ISOFileName)..."
         Write-Host "  To unmount, execute the following command:"
         Write-Host ""
-        Write-Host "     Dismount-DiskImage -ImagePath $(Get-Location)\$($ISOFileName)"
+        Write-Host "     Dismount-DiskImage -ImagePath $($CurrentDirectory)\$($ISOFileName)"
         Write-Host ""
     }
 

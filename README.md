@@ -24,10 +24,10 @@ To ensure that car configuration is correct, please run `tweaks.sh` once after f
 
 **Requirements**:
 
-- `factory_reset.zip` unzipped in the same directory (will be downloaded and unzipped if missing)
-- `ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso` in the same directory (will be downloaded if missing)
+- The custom AWS DeepRacer Ubuntu ISO image `ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso` in the same directory (will be downloaded if missing)
+- The latest AWS DeepRacer software update package `factory_reset.zip` **unzipped** in the same directory (will be downloaded and unzipped if missing)
 
-Both files can be downloaded from here https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-ubuntu-update-preparation.html
+Both files can be downloaded from here https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-ubuntu-update.html (under the "Prerequisites" heading).
 
 ### OSX version
 

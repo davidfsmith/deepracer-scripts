@@ -38,6 +38,11 @@ git fetch origin pull/4/head:compressed-image
 git checkout compressed-image
 cd ..
 
+cd aws-deepracer-model-optimizer-pkg
+git fetch origin pull/2/head:cache-load
+git checkout cache-load
+cd ..
+
 #
 # END - Pull request specific changes
 #
@@ -150,7 +155,7 @@ def generate_launch_description():
         name='model_optimizer_node'
     )
     rplidar_node = Node(
-        package='rplidar_ros2',
+        package='rplidar_ros',
         namespace='rplidar_ros',
         executable='rplidar_scan_publisher',
         name='rplidar_scan_publisher',
@@ -237,7 +242,7 @@ def generate_launch_description():
 EOF
 
 # Build the core
-colcon build --packages-up-to deepracer_launcher rplidar_ros2
+colcon build --packages-up-to deepracer_launcher rplidar_ros
 
 # Build the add-ons
 colcon build --packages-up-to logging_pkg 

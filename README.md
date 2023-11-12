@@ -2,57 +2,121 @@
 
 Please note this scripts are provided as is.... if something breaks through use then a) I'm sorry b) fix it and submit a PR ;-)
 
-## dev-build.sh
-
-Runs on the car from `/home/deepracer` and the intention is that can be used to test pull requests / dev code
-
-    chmod +x dev-build.sh
-    bash /dev-build.sh
-
-## dev-stack-*
+## dev-stack-\*
 
 Refactoring of the `dev-build.sh`, which splits it into three distinct scripts.
 
-| File | Description |
-|------|--------------|
-| `dev-stack-dependencies.sh` | Installs the dependencies for a custom DR stack. Script is only required to be run one time. |
-| `dev-stack-build.sh` | Downloads the packages defined in `ws/.rosinstall` and builds them into the `ws` folder. |
-| `dev-stack-install.sh` | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib`.
+To ensure that car configuration is correct, please run `tweaks.sh` once after flashing the car.
 
-## usb-build.sh
+| -   | File                        | Description                                                                                  |
+| --- | --------------------------- | -------------------------------------------------------------------------------------------- |
+| 1   | `tweaks.sh`                 | Update the car settings.                                                                     |
+| 2   | `dev-stack-dependencies.sh` | Installs the dependencies for a custom DR stack. Script is only required to be run one time. |
+| 3   | `dev-stack-build.sh`        | Downloads the packages defined in `ws/.rosinstall` and builds them into the `ws` folder.     |
+| 4   | `dev-stack-install.sh`      | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib`.                      |
 
-(OSX only)
 
-Requirements:
-* https://unetbootin.github.io/ installed
-* `factory_reset.zip` unzipped in the same directory (will be downloaded if missing)
-* `ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso` in the same directory (will be downloaded if missing)
+## usb-build.*
 
-Download both from here https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-ubuntu-update-preparation.html
+**Recommendations**:
 
-    sudo ./usb-build.sh -d disk2
+- Try using USB 3.0 usb stick, the process will take about 30 minutes per stick compared to 1.5hrs with USB 2.0 ones.
 
-**Note:** Should be updated to use the more generic dd
+**Requirements**:
+
+- The custom AWS DeepRacer Ubuntu ISO image `ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso` in the same directory (will be downloaded if missing)
+- The latest AWS DeepRacer software update package `factory_reset.zip` **unzipped** in the same directory (will be downloaded and unzipped if missing)
+
+Both files can be downloaded from here https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-ubuntu-update.html (under the "Prerequisites" heading).
+
+### OSX version
+
+**Requirements**:
+
+- https://unetbootin.github.io/ installed
+
+**Command**:
+
+```
+./usb-build.sh -d disk2 -s <WIFI_SSID> -w <WIFI_PASSWORD>
+```
+
+**Note:**
+
+- The wifi credentials are used to create `wifi-creds.txt` on the `DEEPRACER` partition, upon rebooting after flashing the car will use this file to connect to wifi
+- Tested and working on Intel and Apple based Macs
+- Unetbootin currently doesn't work on OSX Ventura [#Issue 337](https://github.com/unetbootin/unetbootin/issues/337)
+
+### Ubuntu version
+
+**Requirements**:
+
+- Requires sudo privileges
+- Will add current user to sudoer automatically (with the "no password" option enabled)
+
+**Command**:
+
+```
+./usb-build.ubuntu.sh -d sdX -s <WIFI_SSID> -W <WIFI_PASSWORD>
+```
+
+**Note:**
+
+- The wifi credentials are used to create `wifi-creds.txt` on the `DEEPRACER` partition, upon rebooting after flashing the car will use this file to connect to wifi
+- Tested and working on Ubuntu 20.0.4 (like a DeepRacer car)
+
+### Windows PowerShell version
+
+**Requirements**:
+
+- Run in PowerShell command window (**NOT** run as Administrator, but you will be prompted to elevate with Administrator at some point in the script=
+
+**Command**:
+
+```
+start powershell {.\usb-build.ps1 -DiskId <disk number>}
+```
+
+Additional switches:
+
+Description                                                    | Switch
+---------------------------------------------------------------|---------------------------------------------------
+Provide Wifi Credentials                                       | `-SSID <WIFI_SSID> -SSIDPassword <WIFI_PASSWORD>`
+Create partitions (default value is True)                      | `-CreatePartition <True/False>`
+Ignore lock files (default value is False)                     | `-IgnoreLock <True/False>`
+Ignore Factory Reset content creation (default value is False) | `-IgnoreFactoryReset <True/False>`
+Ignore Boot Drive creation (default value is False)            | `-IgnoreBootDrive <True/False>`
+
+**Note:**
+
+- The wifi credentials are used to create `wifi-creds.txt` on the `DEEPRACER` partition, upon rebooting after flashing the car will use this file to connect to wifi
+- Tested and working on Windows 11 Pro
+
 
 ## tweaks.sh
 
 A script to change a couple of things on the car that I've found useful at events
 
-* Change the hostname
-* Change the car console password (**Note:** Update the default password in the script)
-* Update Ubuntu
-* Update the car software
-* Disable IPV6 on network interfaces
-* Disable the video stream on the car console by default
-* Disable system suspend
-* Disable network power saving
-* Disable the software update check
-* Enable SSH (You've probably already done this)
-* Allow multiple logins to the car console
-* Increase the car console cookie duration
-* Disable Gnome, Bluetooth & CUPS
+- Add `deepracer` user to `sudoers`
+- Change the hostname
+- Change the car console password (**Note:** Update the default password in the script)
+- Update Ubuntu
+- Update the car software
+- Disable IPV6 on network interfaces
+- Disable the video stream on the car console by default
+- Disable system suspend
+- Disable network power saving
+- Disable the software update check
+- Enable SSH (You've probably already done this)
+- Allow multiple logins to the car console
+- Increase the car console cookie duration
+- Disable Gnome, Bluetooth & CUPS
 
-    sudo ./tweaks.sh -h newhostname -p magicpassword
+Command:
+
+```
+sudo ./tweaks.sh -h newhostname -p magicpassword
+```
 
 ## reset-usb.sh
 

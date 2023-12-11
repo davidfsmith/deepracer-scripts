@@ -35,12 +35,13 @@ done
 systemctl stop deepracer-core
 
 # Disable IPV6 on all interfaces
+echo -e -n "\nDisable IPV6\n"
 cp /etc/sysctl.conf ${backupDir}/sysctl.conf.bak
 printf "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
 
 # Update the DeepRacer console password
 if [ $varPass != NULL ]; then
-    echo "Updating password to: $varPass"
+    echo -e -n "\n\nUpdating password to: $varPass \n"
     tempPass=$(echo -n $varPass | sha224sum)
     IFS=' ' read -ra encryptedPass <<< $tempPass
     cp /opt/aws/deepracer/password.txt ${backupDir}/password.txt.bak
@@ -70,17 +71,19 @@ else
     exit 1
 fi
 
-echo 'Updating...'
+echo -e -n "\nUpdating car...\n"
 
 # Get latest key from OpenVINO
 curl -o GPG-PUB-KEY-INTEL-SW-PRODUCTS https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS
 
 # Update Ubuntu
+echo -e -n "\nUpdating Ubuntu packages\n"
 sudo apt-get update
 sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::='--force-confold' -y
 
 # Update DeepRacer
+echo -e -n "\nUpdate DeepRacer packages\n"
 sudo apt-get install aws-deepracer-* -y
 
 # Ensure all packages installed
@@ -88,6 +91,7 @@ sudo apt-get update
 sudo apt-get upgrade -y
 
 # Remove redundant packages
+echo -e -n "\nRemove redundant packages\n"
 sudo apt autoremove -y
 
 # If changing hostname need to change the flag in network_config.py
@@ -95,6 +99,7 @@ sudo apt autoremove -y
 # SET_HOSTNAME_TO_CHASSIS_SERIAL_NUMBER = False
 if [ $DISTRIB_RELEASE = "20.04" ]; then
     if [ $varHost != NULL ]; then
+        echo -e -n "\nSet hostname: ${varHost}\n"
         oldHost=$HOSTNAME
         hostnamectl set-hostname ${varHost}
         cp /etc/hosts ${backupDir}/hosts.bak
@@ -108,6 +113,7 @@ if [ $DISTRIB_RELEASE = "20.04" ]; then
     fi
 
     # Disable software_update
+    echo -e -n "\nDisable software update\n"
     cp ${systemPath}/software_update_module/software_update_config.py ${backupDir}/software_update_config.py.bak
     rm ${systemPath}/software_update_module/software_update_config.py
     cat ${backupDir}/software_update_config.py.bak | sed -e "s/ENABLE_PERIODIC_SOFTWARE_UPDATE = True/ENABLE_PERIODIC_SOFTWARE_UPDATE = False/" > ${systemPath}/software_update_module/software_update_config.py
@@ -115,27 +121,33 @@ if [ $DISTRIB_RELEASE = "20.04" ]; then
 fi
 
 # Disable video stream by default
+echo -e -n "\nDisable video stream\n"
 cp $bundlePath/bundle.js ${backupDir}/bundle.js.bak
 rm $bundlePath/bundle.js
 cat ${backupDir}/bundle.js.bak | sed -e "s/isVideoPlaying\: true/isVideoPlaying\: false/" > $bundlePath/bundle.js
 
 # Disable system suspend
+echo -e -n "\nDisable system suspend\n"
 systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 
 # Disable network power saving
+echo -e -n "\nDisable network power saving"
 echo -e '#!/bin/sh\n/usr/sbin/iw dev mlan0 set power_save off\n' > /etc/network/if-up.d/disable_power_saving
 chmod 755 /etc/network/if-up.d/disable_power_saving
 
 # Enable SSH
+echo -e -n "\nEnable SSH\n"
 service ssh start
 ufw allow ssh
 
 # Allow multiple logins on the console
+echo -e -n "\nEnable multiple logins to the console\n"
 cp /etc/nginx/sites-enabled/default ${backupDir}/default.bak
 rm /etc/nginx/sites-enabled/default
 cat ${backupDir}/default.bak | sed -e "s/auth_request \/auth;/#auth_request \/auth;/" > /etc/nginx/sites-enabled/default
 
 # Change the cookie duration
+echo -e -n "\nUpdate the cookie duration\n"
 cp $webserverPath/login.py ${backupDir}/login.py.bak
 rm $webserverPath/login.py
 cat ${backupDir}/login.py.bak | sed -e "s/datetime.timedelta(hours=1)/datetime.timedelta(hours=12)/" > $webserverPath/login.py

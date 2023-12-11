@@ -41,8 +41,8 @@ cd ..
 
 # https://github.com/aws-deepracer/aws-deepracer-model-optimizer-pkg/pull/2
 cd aws-deepracer-model-optimizer-pkg
-git fetch origin pull/2/optimization-caching
-git checkout optimization-caching
+git fetch origin pull/2/head:cache-load
+git checkout cache-load
 cd ..
 
 # Resolve the dependanices
@@ -160,10 +160,10 @@ def generate_launch_description():
         name='model_optimizer_node'
     )
     rplidar_node = Node(
-        package='rplidar_ros2',
+        package='rplidar_ros',
         namespace='rplidar_ros',
-        executable='rplidar_scan_publisher',
-        name='rplidar_scan_publisher',
+        executable='rplidar_node',
+        name='rplidar_node',
         parameters=[{
                 'serial_port': '/dev/ttyUSB0',
                 'serial_baudrate': 115200,
@@ -248,7 +248,7 @@ def generate_launch_description():
 EOF
 
 # Build the core
-colcon build --packages-up-to deepracer_launcher rplidar_ros2
+colcon build --packages-up-to deepracer_launcher rplidar_ros
 
 # Build the add-ons
 colcon build --packages-up-to logging_pkg 

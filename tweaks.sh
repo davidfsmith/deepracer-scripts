@@ -72,6 +72,10 @@ fi
 
 echo 'Updating...'
 
+# Get latest key from OpenVINO
+curl -o GPG-PUB-KEY-INTEL-SW-PRODUCTS https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS
+
 # Update Ubuntu
 sudo apt-get update
 sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::='--force-confold' -y

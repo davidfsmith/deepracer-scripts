@@ -3,7 +3,7 @@
 # Build the core packages
 sudo systemctl stop deepracer-core
 
-# Make a backup
+# Clean up older install
 if [[ -d /opt/aws/deepracer/lib.custom ]]
 then
     echo "Custom install exists. Deleting."
@@ -20,6 +20,9 @@ sudo cp -Rp /opt/aws/deepracer/lib/device_console /opt/aws/deepracer/lib.custom/
 
 # Create logs directory
 sudo mkdir -p /opt/aws/deepracer/logs
+
+# Re-point start to custom stack
+sudo sed -i "s/\/opt\/aws\/deepracer\/lib\/setup.bash/\/opt\/aws\/deepracer\/lib.custom\/setup.bash/g" /opt/aws/deepracer/start_ros.sh
 
 # Restart deepracer
 sudo systemctl restart deepracer-core

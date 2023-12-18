@@ -15,45 +15,29 @@
 #################################################################################
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node, LaunchConfiguration
+from launch_ros.actions import Node
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
 
-def generate_launch_description():
 
-    camera_fps = LaunchConfiguration('camera_fps')
 
-    camera_fps_arg = DeclareLaunchArgument(
-        name="camera_fps",
-        default_value=30,
-        description="FPS of Camera")
+def launch_setup(context, *args, **kwargs):
 
-    camera_resize = LaunchConfiguration('camera_resize')
+    ld = []
 
-    camera_resize_arg = DeclareLaunchArgument(
-        name="camera_resize",
-        default_value="True",
-        description="Resize camera input")
+    logging_enable = str2bool(LaunchConfiguration('logging_enable').perform(context))
 
-    inference_engine = LaunchConfiguration('inference_engine')
-
-    inference_engine_arg = DeclareLaunchArgument(
-        name="inference_engine",
-        default_value="CPU",
-        description="Inference engine to use")
-
-    ld = LaunchDescription()
     camera_node = Node(
         package='camera_pkg',
         namespace='camera_pkg',
         executable='camera_node',
         name='camera_node',
         parameters=[
-            {'resize_images': str2bool(camera_resize),
-             'fps': camera_fps}
+            {'resize_images': str2bool(LaunchConfiguration('camera_resize').perform(context)),
+             'fps': int(LaunchConfiguration('camera_fps').perform(context))}
         ]
     )
     ctrl_node = Node(
@@ -116,7 +100,7 @@ def generate_launch_description():
         executable='inference_node',
         name='inference_node',
         parameters=[{
-                'device': inference_engine
+                'device': LaunchConfiguration("inference_engine").perform(context)
             }]        
     )
     model_optimizer_node = Node(
@@ -177,48 +161,62 @@ def generate_launch_description():
         executable='web_video_server',
         name='web_video_server'
     )
-    bag_log_node = Node(
-        package='logging_pkg',
-        namespace='logging_pkg',
-        executable='bag_log_node',
-        name='bag_log_node',
-        parameters=[{
-                'monitor_topic_timeout': 15,
-                'output_path': '/opt/aws/deepracer/logs/deepracer-bag-{}',
-                'monitor_topic': '/deepracer_navigation_pkg/auto_drive',
-                'log_topics': ['/ctrl_pkg/servo_msg',
-                               '/inference_pkg/rl_results']
-                }]
-    ) 
 
-    ld.add_action(camera_fps)
-    ld.add_action(camera_fps_arg)
+    if logging_enable:
+        bag_log_node = Node(
+            package='logging_pkg',
+            namespace='logging_pkg',
+            executable='bag_log_node',
+            name='bag_log_node',
+            parameters=[{
+                    'monitor_topic_timeout': 15,
+                    'output_path': '/opt/aws/deepracer/logs/deepracer-bag-{}',
+                    'monitor_topic': '/deepracer_navigation_pkg/auto_drive',
+                    'log_topics': ['/ctrl_pkg/servo_msg',
+                                '/inference_pkg/rl_results']
+                    }]
+        ) 
 
-    ld.add_action(camera_resize)
-    ld.add_action(camera_resize_arg)
+    ld.append(camera_node)
+    ld.append(ctrl_node)
+    ld.append(deepracer_navigation_node)
+    ld.append(software_update_node)
+    ld.append(model_loader_node)
+    ld.append(otg_control_node)
+    ld.append(network_monitor_node)
+    ld.append(deepracer_systems_scripts_node)
+    ld.append(device_info_node)
+    ld.append(battery_node)
+    ld.append(inference_node)
+    ld.append(model_optimizer_node)
+    ld.append(rplidar_node)
+    ld.append(sensor_fusion_node)
+    ld.append(servo_node)
+    ld.append(status_led_node)
+    ld.append(usb_monitor_node)
+    ld.append(webserver_publisher_node)
+    ld.append(web_video_server_node)
 
-    ld.add_action(inference_engine)
-    ld.add_action(inference_engine_arg)
-
-    ld.add_action(camera_node)
-    ld.add_action(ctrl_node)
-    ld.add_action(deepracer_navigation_node)
-    ld.add_action(software_update_node)
-    ld.add_action(model_loader_node)
-    ld.add_action(otg_control_node)
-    ld.add_action(network_monitor_node)
-    ld.add_action(deepracer_systems_scripts_node)
-    ld.add_action(device_info_node)
-    ld.add_action(battery_node)
-    ld.add_action(inference_node)
-    ld.add_action(model_optimizer_node)
-    ld.add_action(rplidar_node)
-    ld.add_action(sensor_fusion_node)
-    ld.add_action(servo_node)
-    ld.add_action(status_led_node)
-    ld.add_action(usb_monitor_node)
-    ld.add_action(webserver_publisher_node)
-    ld.add_action(web_video_server_node)
-    ld.add_action(bag_log_node)
+    if logging_enable:
+        ld.append(bag_log_node)
 
     return ld
+
+def generate_launch_description():
+   return LaunchDescription([DeclareLaunchArgument(
+                                name="camera_fps",
+                                default_value="30",
+                                description="FPS of Camera"), 
+                            DeclareLaunchArgument(
+                                name="camera_resize",
+                                default_value="True",
+                                description="Resize camera input"),
+                            DeclareLaunchArgument(
+                                name="inference_engine",
+                                default_value="CPU",
+                                description="Inference engine to use"),
+                            DeclareLaunchArgument(
+                                name="logging_enable",
+                                default_value="False",
+                                description="Enable the logging of results to ROS Bag"),
+                            OpaqueFunction(function=launch_setup)])

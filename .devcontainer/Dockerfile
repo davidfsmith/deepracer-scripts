@@ -21,7 +21,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
 
 ARG build_id=2021.1.110
 # Install full package
-RUN curl -o GPG-PUB-KEY-INTEL-OPENVINO-2021 https://apt.repos.intel.com/openvino/2021/GPG-PUB-KEY-INTEL-OPENVINO-2021 && \
+RUN curl -o GPG-PUB-KEY-INTEL-SW-PRODUCTS https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && \
+    apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS && \
+    curl -o GPG-PUB-KEY-INTEL-OPENVINO-2021 https://apt.repos.intel.com/openvino/2021/GPG-PUB-KEY-INTEL-OPENVINO-2021 && \
     apt-key add GPG-PUB-KEY-INTEL-OPENVINO-2021 && \
     echo "deb https://apt.repos.intel.com/openvino/2021 all main" | tee - a /etc/apt/sources.list.d/intel-openvino-2021.list && \
     apt-get update && apt-get install -y --no-install-recommends intel-openvino-dev-ubuntu20-"${build_id}" && \

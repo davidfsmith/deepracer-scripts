@@ -19,4 +19,4 @@ sudo /opt/intel/openvino_2021/install_dependencies/install_NEO_OCL_driver.sh -y
 # Update ROS
 sudo rosdep init
 sudo rosdep fix-permissions
-rosdep update
+rosdep update --include-eol-distros

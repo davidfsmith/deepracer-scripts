@@ -4,29 +4,23 @@
 sudo systemctl stop deepracer-core
 
 # Make a backup
-if [[ -d /opt/aws/deepracer/lib.orig ]]
+if [[ -d /opt/aws/deepracer/lib.custom ]]
 then
-    echo "Backup exists"
-    if [[ -d /opt/aws/deepracer/lib ]]
-    then
-        echo "Deleting current install"
-        sudo rm -rf /opt/aws/deepracer/lib
-    fi
-else
-    echo "Making backup"
-    sudo mv /opt/aws/deepracer/lib /opt/aws/deepracer/lib.orig
+    echo "Custom install exists. Deleting."
+    sudo rm -rf /opt/aws/deepracer/lib.custom
 fi
 
 # Copy the build
 echo "Copy files"
-sudo cp -Rp $(pwd)/ws/install /opt/aws/deepracer/lib
+sudo cp -Rp $(pwd)/ws/install /opt/aws/deepracer/lib.custom
 
 # Copy in the console code
 echo "Copying console code"
-sudo cp -Rp /opt/aws/deepracer/lib.orig/device_console /opt/aws/deepracer/lib/
+sudo cp -Rp /opt/aws/deepracer/lib/device_console /opt/aws/deepracer/lib.custom/
 
 # Create logs directory
 sudo mkdir -p /opt/aws/deepracer/logs
 
 # Restart deepracer
 sudo systemctl restart deepracer-core
+

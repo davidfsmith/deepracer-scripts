@@ -59,6 +59,9 @@ rm -rf install build log
 # Update deepracer_launcher.py (fix an issue in the file)
 cp ../launch/deepracer_launcher.py ./aws-deepracer-launcher/deepracer_launcher/launch/deepracer_launcher.py
 
+# Turn off SW update
+sed -i "s/ENABLE_PERIODIC_SOFTWARE_UPDATE = True/ENABLE_PERIODIC_SOFTWARE_UPDATE = False/" aws-deepracer-systems-pkg/deepracer_systems_pkg/deepracer_systems_pkg/software_update_module/software_update_config.py
+
 # Build the core
 colcon build --packages-up-to deepracer_launcher rplidar_ros
 

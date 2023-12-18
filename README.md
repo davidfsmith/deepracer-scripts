@@ -13,8 +13,23 @@ To ensure that car configuration is correct, please run `tweaks.sh` once after f
 | 1   | `tweaks.sh`                 | Update the car settings.                                                                     |
 | 2   | `dev-stack-dependencies.sh` | Installs the dependencies for a custom DR stack. Script is only required to be run one time. |
 | 3   | `dev-stack-build.sh`        | Downloads the packages defined in `ws/.rosinstall` and builds them into the `ws` folder.     |
-| 4   | `dev-stack-install.sh`      | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib`.                      |
+| 4   | `dev-stack-install.sh`      | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib.custom`, and changes `/opt/aws/deepracer/start_ros.sh` to use it.               |
 
+The custom stack exposes the following arguments which can be changed through changing `/opt/aws/deepracer/start_ros.sh`.
+
+| Argument | Default | Description | 
+| -------- | ------- | ----------- |
+| `camera_fps` | `30` | Number of camera frames per second, directly impacting how frequently the car takes new actions. |
+| `camera_resize` | `True` | Does the camera resize from 640x480 to 160x120 at source. | 
+| `inference_engine` | `CPU` | What device will perform inference. Can be `CPU`, `GPU` or `MYRIAD`; Myriad is the intel compute stick. |
+| `logging_enable` | `False` | Shall the output of inference be written to a ROS Bag? |
+
+Example custom `/opt/aws/deepracer/start_ros.sh`:
+    
+    source /opt/ros/foxy/setup.bash
+    source /opt/aws/deepracer/lib.custom/setup.bash
+    source /opt/intel/openvino_2021/bin/setupvars.sh
+    ros2 launch deepracer_launcher deepracer_launcher.py camera_resize:=False camera_fps:=15 logging_enable:=True
 
 ## usb-build.*
 

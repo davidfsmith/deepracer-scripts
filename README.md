@@ -8,12 +8,14 @@ Refactoring of the `dev-build.sh`, which splits it into three distinct scripts.
 
 To ensure that car configuration is correct, please run `tweaks.sh` once after flashing the car.
 
-| -   | File                        | Description                                                                                  |
-| --- | --------------------------- | -------------------------------------------------------------------------------------------- |
-| 1   | `tweaks.sh`                 | Update the car settings.                                                                     |
-| 2   | `dev-stack-dependencies.sh` | Installs the dependencies for a custom DR stack. Script is only required to be run one time. |
-| 3   | `dev-stack-build.sh`        | Downloads the packages defined in `ws/.rosinstall` and builds them into the `ws` folder.     |
-| 4   | `dev-stack-install.sh`      | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib.custom`, and changes `/opt/aws/deepracer/start_ros.sh` to use it.               |
+| -   | File                          | Description                                                                                  |
+| --- | ----------------------------- | -------------------------------------------------------------------------------------------- |
+| 1   | `tweaks.sh`                   | Update the car settings.                                                                     |
+| 2   | `dev-stack-dependencies.sh`   | Installs the dependencies for a custom DR stack. Script is only required to be run one time. |
+| 3   | `dev-stack-build.sh`          | Downloads the packages defined in `ws/.rosinstall` and builds them into the `ws` folder.     |
+| 4   | `dev-stack-install.sh`        | Installs the stack built in `ws/install` into `/opt/aws/deepracer/lib.custom`, and changes `/opt/aws/deepracer/start_ros.sh` to use it. |
+| 5   | `dev-stack-install-remote.sh` | Pushes an install onto a remote machine. Add as parameter the SSH information e.g. `deepracer@amss-hm12` |
+
 
 The custom stack exposes the following arguments which can be changed through changing `/opt/aws/deepracer/start_ros.sh`.
 

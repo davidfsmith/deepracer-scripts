@@ -19,7 +19,7 @@ echo "Copying console code"
 sudo cp -Rp /opt/aws/deepracer/lib/device_console /opt/aws/deepracer/lib.custom/
 
 # Disable automatic video playing
-sed -i "s/isVideoPlaying\: true/isVideoPlaying\: false/" /opt/aws/deepracer/lib.custom/device_console/static/bundle.js
+sudo sed -i "s/isVideoPlaying\: true/isVideoPlaying\: false/" /opt/aws/deepracer/lib.custom/device_console/static/bundle.js
 
 # Create logs directory
 sudo mkdir -p /opt/aws/deepracer/logs

@@ -27,6 +27,8 @@ sudo mkdir -p /opt/aws/deepracer/logs
 # Re-point start to custom stack
 sudo sed -i "s/\/opt\/aws\/deepracer\/lib\/setup.bash/\/opt\/aws\/deepracer\/lib.custom\/setup.bash/g" /opt/aws/deepracer/start_ros.sh
 
+# Doublecheck all dependencies (useful on remote install)
+sudo rosdep install -i --from-path /opt/aws/deepracer/lib.custom/ --rosdistro foxy -y
+
 # Restart deepracer
 sudo systemctl restart deepracer-core
-

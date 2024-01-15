@@ -6,12 +6,6 @@ usage()
     exit 0
 }
 
-# Check we have the privileges we need
-# if [ `whoami` != root ]; then
-#     echo "Please run this script as root or using sudo"
-#     exit 0
-# fi
-
 disk=disk2
 ssid=NULL
 wifiPass=NULL

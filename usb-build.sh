@@ -51,7 +51,6 @@ EOF
 
 fi
 
-# Issues with 10.13 and above -> https://github.com/unetbootin/unetbootin/issues/337
 # https://github.com/unetbootin/unetbootin/wiki/commands
 echo -e -n "\n- Writing ISO to USB - Password required for disk access"
 sudo /Applications/unetbootin.app/Contents/MacOS/unetbootin method=diskimage isofile=ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso installtype=USB targetdrive=/dev/${disk}s1 autoinstall=yes

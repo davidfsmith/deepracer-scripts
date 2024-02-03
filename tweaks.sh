@@ -130,6 +130,10 @@ cat ${backupDir}/bundle.js.bak | sed -e "s/isVideoPlaying\: true/isVideoPlaying\
 echo -e -n "\nDisable system suspend\n"
 systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 
+# Disable X on startup
+echo -e -n "\nSet console-only at startup\n"
+systemctl set-default multi-user.target
+
 # Disable network power saving
 echo -e -n "\nDisable network power saving"
 echo -e '#!/bin/sh\n/usr/sbin/iw dev mlan0 set power_save off\n' > /etc/network/if-up.d/disable_power_saving

@@ -101,7 +101,7 @@ def launch_setup(context, *args, **kwargs):
         name='inference_node',
         parameters=[{
                 'device': LaunchConfiguration("inference_engine").perform(context)
-            }]        
+            }]
     )
     model_optimizer_node = Node(
         package='model_optimizer_pkg',
@@ -129,7 +129,7 @@ def launch_setup(context, *args, **kwargs):
         name='sensor_fusion_node',
         parameters=[{
                 'image_transport': 'compressed'
-            }]    
+            }]
     )
     servo_node = Node(
         package='servo_pkg',
@@ -159,7 +159,10 @@ def launch_setup(context, *args, **kwargs):
         package='web_video_server',
         namespace='web_video_server',
         executable='web_video_server',
-        name='web_video_server'
+        name='web_video_server',
+        parameters=[{
+                'default_transport': 'compressed'
+            }]
     )
 
     if logging_enable:

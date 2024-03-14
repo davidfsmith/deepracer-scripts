@@ -6,3 +6,7 @@
 factory_reset*
 ws/*
 !ws/.rosinstall
+__pycache__
+*.pyc
+pkg-build/
+dist/

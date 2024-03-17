@@ -174,8 +174,9 @@ def launch_setup(context, *args, **kwargs):
             name='bag_log_node',
             parameters=[{
                     'monitor_topic_timeout': 15,
-                    'output_path': '/opt/aws/deepracer/logs/deepracer-bag-{}',
+                    'output_path': '/opt/aws/deepracer/logs',
                     'monitor_topic': '/deepracer_navigation_pkg/auto_drive',
+                    'file_name_topic': '/inference_pkg/model_artifact',
                     'log_topics': ['/ctrl_pkg/servo_msg',
                                 '/inference_pkg/rl_results']
                     }]

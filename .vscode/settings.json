@@ -2,9 +2,11 @@
     "cmake.configureOnOpen": false,
     "python.autoComplete.extraPaths": [
         "/opt/ros/foxy/lib/python3.8/site-packages/",
+        "/workspaces/deepracer-scripts/ws/install/deepracer_interfaces_pkg/lib/python3.8/site-packages"
     ],
     "python.analysis.extraPaths": [
         "/opt/ros/foxy/lib/python3.8/site-packages/",
+        "/workspaces/deepracer-scripts/ws/install/deepracer_interfaces_pkg/lib/python3.8/site-packages"
     ],
     "files.associations": {
         "condition_variable": "cpp",
@@ -75,24 +77,17 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "unordered_set": "cpp"
     },
-    "ros.distro": "foxy",
-    "python.linting.pylintEnabled": false,
-    "python.linting.enabled": true,
-    "python.linting.flake8Enabled": false,
-    "python.linting.pycodestyleEnabled": true,
-    "python.linting.pycodestyleArgs": ["--max-line-length","120"],
-    "python.formatting.provider": "autopep8",
-    "python.formatting.autopep8Args": [
-        "--max-line-length",
-        "120",
-        "--experimental"
-    ],
     "files.exclude": {
         "**/build": true
     },
     "search.exclude": {
       "**/build": true
     },
+    "C_Cpp.default.compilerPath": "/usr/bin/g++-9",
+    "autopep8.args": [
+        "--max-line-length=120"
+    ],
 }

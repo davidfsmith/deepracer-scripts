@@ -100,7 +100,8 @@ def launch_setup(context, *args, **kwargs):
         executable='inference_node',
         name='inference_node',
         parameters=[{
-                'device': LaunchConfiguration("inference_engine").perform(context)
+                'device': LaunchConfiguration("inference_device").perform(context),
+                'inference_engine': LaunchConfiguration("inference_engine").perform(context)
             }]        
     )
     model_optimizer_node = Node(
@@ -159,7 +160,10 @@ def launch_setup(context, *args, **kwargs):
         package='web_video_server',
         namespace='web_video_server',
         executable='web_video_server',
-        name='web_video_server'
+        name='web_video_server',
+        parameters=[{
+                'default_transport': 'compressed'
+            }]        
     )
 
     if logging_enable:
@@ -170,8 +174,9 @@ def launch_setup(context, *args, **kwargs):
             name='bag_log_node',
             parameters=[{
                     'monitor_topic_timeout': 15,
-                    'output_path': '/opt/aws/deepracer/logs/deepracer-bag-{}',
+                    'output_path': '/opt/aws/deepracer/logs',
                     'monitor_topic': '/deepracer_navigation_pkg/auto_drive',
+                    'file_name_topic': '/inference_pkg/model_artifact',
                     'log_topics': ['/ctrl_pkg/servo_msg',
                                 '/inference_pkg/rl_results']
                     }]
@@ -203,20 +208,24 @@ def launch_setup(context, *args, **kwargs):
     return ld
 
 def generate_launch_description():
-   return LaunchDescription([DeclareLaunchArgument(
-                                name="camera_fps",
-                                default_value="30",
-                                description="FPS of Camera"), 
-                            DeclareLaunchArgument(
-                                name="camera_resize",
-                                default_value="True",
-                                description="Resize camera input"),
-                            DeclareLaunchArgument(
-                                name="inference_engine",
-                                default_value="CPU",
-                                description="Inference engine to use"),
-                            DeclareLaunchArgument(
-                                name="logging_enable",
-                                default_value="False",
-                                description="Enable the logging of results to ROS Bag"),
-                            OpaqueFunction(function=launch_setup)])
+    return LaunchDescription([DeclareLaunchArgument(
+                                 name="camera_fps",
+                                 default_value="30",
+                                 description="FPS of Camera"), 
+                             DeclareLaunchArgument(
+                                 name="camera_resize",
+                                 default_value="True",
+                                 description="Resize camera input"),
+                             DeclareLaunchArgument(
+                                 name="inference_engine",
+                                 default_value="TFLITE",
+                                 description="Inference engine to use (TFLITE or OV)"),
+                             DeclareLaunchArgument(
+                                 name="inference_device",
+                                 default_value="CPU",
+                                 description="Inference device to use, applicable to OV only (CPU, GPU or MYRIAD)."),
+                             DeclareLaunchArgument(
+                                 name="logging_enable",
+                                 default_value="False",
+                                 description="Enable the logging of results to ROS Bag"),
+                             OpaqueFunction(function=launch_setup)])

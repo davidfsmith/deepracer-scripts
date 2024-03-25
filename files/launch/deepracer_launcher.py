@@ -100,13 +100,16 @@ def launch_setup(context, *args, **kwargs):
         parameters=[{
                 'device': LaunchConfiguration("inference_device").perform(context),
                 'inference_engine': LaunchConfiguration("inference_engine").perform(context)
-            }]        
+            }]
     )
     model_optimizer_node = Node(
         package='model_optimizer_pkg',
         namespace='model_optimizer_pkg',
         executable='model_optimizer_node',
-        name='model_optimizer_node'
+        name='model_optimizer_node',
+        parameters=[{
+                'inference_engine': LaunchConfiguration("inference_engine").perform(context)
+        }]
     )
     rplidar_node = Node(
         package='rplidar_ros',

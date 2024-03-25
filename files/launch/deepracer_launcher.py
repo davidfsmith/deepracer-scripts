@@ -28,8 +28,6 @@ def launch_setup(context, *args, **kwargs):
 
     ld = []
 
-    logging_enable = str2bool(LaunchConfiguration('logging_enable').perform(context))
-
     camera_node = Node(
         package='camera_pkg',
         namespace='camera_pkg',
@@ -165,22 +163,22 @@ def launch_setup(context, *args, **kwargs):
                 'default_transport': 'compressed'
             }]        
     )
-
-    if logging_enable:
-        bag_log_node = Node(
-            package='logging_pkg',
-            namespace='logging_pkg',
-            executable='bag_log_node',
-            name='bag_log_node',
-            parameters=[{
-                    'monitor_topic_timeout': 15,
-                    'output_path': '/opt/aws/deepracer/logs',
-                    'monitor_topic': '/deepracer_navigation_pkg/auto_drive',
-                    'file_name_topic': '/inference_pkg/model_artifact',
-                    'log_topics': ['/ctrl_pkg/servo_msg',
-                                '/inference_pkg/rl_results']
-                    }]
-        ) 
+    bag_log_node = Node(
+        package='logging_pkg',
+        namespace='logging_pkg',
+        executable='bag_log_node',
+        name='bag_log_node',
+        parameters=[{
+                'logging_mode': LaunchConfiguration(
+                    'logging_mode').perform(context),
+                'monitor_topic_timeout': 15,
+                'output_path': '/opt/aws/deepracer/logs',
+                'monitor_topic': '/deepracer_navigation_pkg/auto_drive',
+                'file_name_topic': '/inference_pkg/model_artifact',
+                'log_topics': ['/ctrl_pkg/servo_msg',
+                               '/inference_pkg/rl_results']
+        }]
+    )
 
     ld.append(camera_node)
     ld.append(ctrl_node)
@@ -201,9 +199,7 @@ def launch_setup(context, *args, **kwargs):
     ld.append(usb_monitor_node)
     ld.append(webserver_publisher_node)
     ld.append(web_video_server_node)
-
-    if logging_enable:
-        ld.append(bag_log_node)
+    ld.append(bag_log_node)
 
     return ld
 
@@ -225,7 +221,7 @@ def generate_launch_description():
                                  default_value="CPU",
                                  description="Inference device to use, applicable to OV only (CPU, GPU or MYRIAD)."),
                              DeclareLaunchArgument(
-                                 name="logging_enable",
-                                 default_value="False",
-                                 description="Enable the logging of results to ROS Bag"),
+                                 name="logging_mode",
+                                 default_value="usbonly",
+                                 description="Enable the logging of results to ROS Bag on USB stick"),
                              OpaqueFunction(function=launch_setup)])

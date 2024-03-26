@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+
 # Build the core packages
 sudo systemctl stop deepracer-core
 

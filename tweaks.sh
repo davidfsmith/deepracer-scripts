@@ -109,7 +109,7 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-a
 
 # Update package lists
 echo -e -n "\nUpdating Ubuntu packages\n"
-sudo apt-get update
+apt update
 
 # Remove unnecessary packages - first add the smaller versions
 apt install -y --no-install-recommends ubuntu-server ros-foxy-ros-base ros-dev-tools
@@ -119,10 +119,13 @@ echo -e -n "\nRemove redundant packages\n"
 apt autoremove -y --purge
 
 # Update Ubuntu
-sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::='--force-confold' -y
+apt upgrade -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::='--force-confold' -y
+
+# Additional packages
+apt install -y --no-install-recommends libboost-dev libboost-thread-dev libboost-regex-dev libboost-filesystem-dev
 
 # Remove redundant packages
-sudo apt autoremove -y
+apt autoremove -y
 
 # If changing hostname need to change the flag in network_config.py
 # /opt/aws/deepracer/lib/deepracer_systems_pkg/lib/python3.8/site-packages/deepracer_systems_pkg/network_monitor_module/network_config.py

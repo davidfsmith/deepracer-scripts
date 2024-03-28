@@ -70,7 +70,7 @@ do
               dpkg-deb -R src/aws-deepracer-core_*amd64.deb aws-deepracer-core
               cd aws-deepracer-core
               sed -i "s/Version: .*/Version: $VERSION/" DEBIAN/control
-              sed -i '/Depends/ s/$/, gnupg/' DEBIAN/control
+              sed -i '/Depends/ s/$/, gnupg, ros-foxy-ros-base, ros-foxy-std-msgs, ros-foxy-sensor-msgs, ros-foxy-image-transport, ros-foxy-compressed-image-transport, ros-foxy-cv-bridge/' DEBIAN/control
               rm -rf opt/aws/deepracer/lib/*
               cp $DIR/files/start_ros.sh opt/aws/deepracer
               cp -r $DIR/ws/install/* opt/aws/deepracer/lib/

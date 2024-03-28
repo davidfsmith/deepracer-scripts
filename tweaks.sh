@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+DEBIAN_FRONTEND=noninteractive
+
 usage()
 {
     echo "Usage: sudo $0 -h HOSTNAME -p PASSWORD"
@@ -71,27 +73,55 @@ else
     exit 1
 fi
 
+# Disable system suspend
+echo -e -n "\nDisable system suspend\n"
+systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+
+# Disable network power saving
+echo -e -n "\nDisable network power saving"
+echo -e '#!/bin/sh\n/usr/sbin/iw dev mlan0 set power_save off\n' > /etc/network/if-up.d/disable_power_saving
+chmod 755 /etc/network/if-up.d/disable_power_saving
+
+# Enable SSH
+echo -e -n "\nEnable SSH\n"
+service ssh start
+ufw allow ssh
+
+# Disable Gnome and other services
+# - to enable gnome - systemctl set-default graphical
+# - to start gnome -  systemctl start gdm3
+systemctl stop bluetooth
+systemctl stop cups-browsed
+
+# Disable X on startup
+echo -e -n "\nSet console-only at startup\n"
+systemctl set-default multi-user.target
+
 echo -e -n "\nUpdating car...\n"
 
 # Get latest key from OpenVINO
 curl -o GPG-PUB-KEY-INTEL-SW-PRODUCTS https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS
+apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS
 
-# Update Ubuntu
+# Get latest key from ROS
+curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list >/dev/null
+
+# Update package lists
 echo -e -n "\nUpdating Ubuntu packages\n"
 sudo apt-get update
+
+# Remove unnecessary packages - first add the smaller versions
+apt install -y --no-install-recommends ubuntu-server ros-foxy-ros-base ros-dev-tools
+apt purge -y ubuntu-desktop ubuntu-desktop-minimal ubuntu-wallpapers ros-foxy-desktop firefox-locale-en firefox fonts-indic gnome-shell gnome-keyring gnome-terminal gnome-control-center language-pack-gnome-en-base wbritish wamerican mplayer hplip gvfs
+
+echo -e -n "\nRemove redundant packages\n"
+apt autoremove -y --purge
+
+# Update Ubuntu
 sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::='--force-confold' -y
 
-# Update DeepRacer
-echo -e -n "\nUpdate DeepRacer packages\n"
-sudo apt-get install aws-deepracer-* -y
-
-# Ensure all packages installed
-sudo apt-get update
-sudo apt-get upgrade -y
-
 # Remove redundant packages
-echo -e -n "\nRemove redundant packages\n"
 sudo apt autoremove -y
 
 # If changing hostname need to change the flag in network_config.py
@@ -126,24 +156,6 @@ cp $bundlePath/bundle.js ${backupDir}/bundle.js.bak
 rm $bundlePath/bundle.js
 cat ${backupDir}/bundle.js.bak | sed -e "s/isVideoPlaying\: true/isVideoPlaying\: false/" > $bundlePath/bundle.js
 
-# Disable system suspend
-echo -e -n "\nDisable system suspend\n"
-systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
-
-# Disable X on startup
-echo -e -n "\nSet console-only at startup\n"
-systemctl set-default multi-user.target
-
-# Disable network power saving
-echo -e -n "\nDisable network power saving"
-echo -e '#!/bin/sh\n/usr/sbin/iw dev mlan0 set power_save off\n' > /etc/network/if-up.d/disable_power_saving
-chmod 755 /etc/network/if-up.d/disable_power_saving
-
-# Enable SSH
-echo -e -n "\nEnable SSH\n"
-service ssh start
-ufw allow ssh
-
 # Allow multiple logins on the console
 echo -e -n "\nEnable multiple logins to the console\n"
 cp /etc/nginx/sites-enabled/default ${backupDir}/default.bak
@@ -155,13 +167,6 @@ echo -e -n "\nUpdate the cookie duration\n"
 cp $webserverPath/login.py ${backupDir}/login.py.bak
 rm $webserverPath/login.py
 cat ${backupDir}/login.py.bak | sed -e "s/datetime.timedelta(hours=1)/datetime.timedelta(hours=12)/" > $webserverPath/login.py
-
-# Disable Gnome and other services
-# - to enable gnome - systemctl set-default graphical
-# - to start gnome -  systemctl start gdm3
-systemctl set-default multi-user
-systemctl stop bluetooth
-systemctl stop cups-browsed
 
 # Default running service list
 # service --status-all | grep '\[ + \]'

@@ -105,24 +105,22 @@ apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS
 
 # Get latest key from ROS
 curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list >/dev/null
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2-latest.list >/dev/null
 
 # Update package lists
 echo -e -n "\nUpdating Ubuntu packages\n"
 apt update
 
-# Remove unnecessary packages - first add the smaller versions
-apt install -y --no-install-recommends ubuntu-server ros-foxy-ros-base ros-dev-tools
-apt purge -y ubuntu-desktop ubuntu-desktop-minimal ubuntu-wallpapers ros-foxy-desktop firefox-locale-en firefox fonts-indic gnome-shell gnome-keyring gnome-terminal gnome-control-center language-pack-gnome-en-base wbritish wamerican mplayer hplip gvfs
+# Remove unnecessary packages - first hold the smaller versions
+apt-mark manual ubuntu-standard ros-foxy-ros-base libboost-all-dev
+snap remove gnome-3-34-1804 gtk-common-themes snap-store && snap remove core18 && snap remove snapd
+apt purge -y ubuntu-desktop ubuntu-desktop-minimal ubuntu-wallpapers ros-foxy-desktop firefox-locale-en firefox fonts-indic gnome-shell gnome-keyring gnome-terminal gnome-control-center language-pack-gnome-en-base wbritish wamerican mplayer hplip gvfs snapd
 
 echo -e -n "\nRemove redundant packages\n"
 apt autoremove -y --purge
 
 # Update Ubuntu
 apt upgrade -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::='--force-confold' -y
-
-# Additional packages
-apt install -y --no-install-recommends libboost-dev libboost-thread-dev libboost-regex-dev libboost-filesystem-dev
 
 # Remove redundant packages
 apt autoremove -y

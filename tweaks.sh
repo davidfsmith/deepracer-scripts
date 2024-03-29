@@ -122,6 +122,9 @@ apt autoremove -y --purge
 # Update Ubuntu
 apt upgrade -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::='--force-confold' -y
 
+# Additional packages
+apt install -y --no-install-recommends python3-websocket python3-click
+
 # Remove redundant packages
 apt autoremove -y
 

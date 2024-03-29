@@ -174,42 +174,26 @@ cat ${backupDir}/login.py.bak | sed -e "s/datetime.timedelta(hours=1)/datetime.t
 
 # Default running service list
 # service --status-all | grep '\[ + \]'
-#  [ + ]  acpid
 #  [ + ]  alsa-utils
 #  [ + ]  apparmor
-#  [ + ]  apport
 #  [ + ]  avahi-daemon
-#  [ + ]  binfmt-support
-#  [ + ]  bluetooth
-#  [ + ]  console-setup
 #  [ + ]  cron
-#  [ + ]  cups-browsed
 #  [ + ]  dbus
 #  [ + ]  dnsmasq
 #  [ + ]  fail2ban
-#  [ + ]  grub-common
 #  [ + ]  irqbalance
 #  [ + ]  isc-dhcp-server
-#  [ + ]  keyboard-setup
 #  [ + ]  kmod
-#  [ + ]  lightdm
 #  [ + ]  network-manager
-#  [ + ]  networking
 #  [ + ]  nginx
-#  [ + ]  ondemand
 #  [ + ]  procps
-#  [ + ]  rc.local
-#  [ + ]  resolvconf
 #  [ + ]  rsyslog
-#  [ + ]  speech-dispatcher
 #  [ + ]  ssh
-#  [ + ]  thermald
+#  [ + ]  system-init
 #  [ + ]  udev
 #  [ + ]  ufw
-#  [ + ]  urandom
 #  [ + ]  uuidd
-#  [ + ]  watchdog
-#  [ + ]  whoopsie
+#  [ + ]  wd_keepalive
 
 # Restart services
 echo 'Restarting services'

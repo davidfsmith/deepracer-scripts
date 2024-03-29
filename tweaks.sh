@@ -128,6 +128,11 @@ apt install -y --no-install-recommends python3-websocket python3-click
 # Remove redundant packages
 apt autoremove -y
 
+# Remove Swap
+swapoff -a
+sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+rm /swapfile
+
 # If changing hostname need to change the flag in network_config.py
 # /opt/aws/deepracer/lib/deepracer_systems_pkg/lib/python3.8/site-packages/deepracer_systems_pkg/network_monitor_module/network_config.py
 # SET_HOSTNAME_TO_CHASSIS_SERIAL_NUMBER = False

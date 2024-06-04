@@ -73,9 +73,12 @@ if [ ! -d factory_reset ]; then
 else
     echo -e -n "\nZip file found"
 fi
+
 echo -e -n "\n- Writing zip file contents to USB\n"
 rsync -av --progress factory_reset/* /Volumes/FLASH
 
+echo -e -n "\nEjecting USB /dev/${disk}\n"
+sudo diskutil eject /dev/${disk}
 echo -e -n "\nDone"
 
 exit 0

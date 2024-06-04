@@ -26,7 +26,7 @@ if [ $OPTIND -eq 1 ]; then
     usage
 fi
 
-echo -e -n "\nCfreating partitions on USB /dev/${disk}\n"
+echo -e -n "\nCreating partitions on USB /dev/${disk}\n"
 diskutil partitionDisk /dev/${disk} MBR fat32 BOOT 4gb fat32 DEEPRACER 2gb exfat FLASH 14gb
 
 # Grab the ISO -> https://s3.amazonaws.com/deepracer-public/factory-restore/Ubuntu20.04/BIOS-0.0.8/ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso

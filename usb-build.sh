@@ -26,7 +26,7 @@ if [ $OPTIND -eq 1 ]; then
     usage
 fi
 
-echo -e -n "\nCfreating partitions on USB /dev/${disk}\n"
+echo -e -n "\nCreating partitions on USB /dev/${disk}\n"
 diskutil partitionDisk /dev/${disk} MBR fat32 BOOT 4gb fat32 DEEPRACER 2gb exfat FLASH 14gb
 
 # Grab the ISO -> https://s3.amazonaws.com/deepracer-public/factory-restore/Ubuntu20.04/BIOS-0.0.8/ubuntu-20.04.1-20.11.13_V1-desktop-amd64.iso
@@ -73,9 +73,12 @@ if [ ! -d factory_reset ]; then
 else
     echo -e -n "\nZip file found"
 fi
+
 echo -e -n "\n- Writing zip file contents to USB\n"
 rsync -av --progress factory_reset/* /Volumes/FLASH
 
+echo -e -n "\nEjecting USB /dev/${disk}\n"
+sudo diskutil eject /dev/${disk}
 echo -e -n "\nDone"
 
 exit 0

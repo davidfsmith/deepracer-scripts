@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+DEBIAN_FRONTEND=noninteractive
+
 usage()
 {
     echo "Usage: sudo $0 -h HOSTNAME -p PASSWORD"
@@ -71,28 +73,65 @@ else
     exit 1
 fi
 
+# Disable system suspend
+echo -e -n "\nDisable system suspend\n"
+systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+
+# Disable network power saving
+echo -e -n "\nDisable network power saving"
+echo -e '#!/bin/sh\n/usr/sbin/iw dev mlan0 set power_save off\n' > /etc/network/if-up.d/disable_power_saving
+chmod 755 /etc/network/if-up.d/disable_power_saving
+
+# Enable SSH
+echo -e -n "\nEnable SSH\n"
+service ssh start
+ufw allow ssh
+
+# Disable Gnome and other services
+# - to enable gnome - systemctl set-default graphical
+# - to start gnome -  systemctl start gdm3
+systemctl stop bluetooth
+systemctl stop cups-browsed
+
+# Disable X on startup
+echo -e -n "\nSet console-only at startup\n"
+systemctl set-default multi-user.target
+
 echo -e -n "\nUpdating car...\n"
 
 # Get latest key from OpenVINO
 curl -o GPG-PUB-KEY-INTEL-SW-PRODUCTS https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS
+apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS
+
+# Get latest key from ROS
+curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2-latest.list >/dev/null
+
+# Update package lists
+echo -e -n "\nUpdating Ubuntu packages\n"
+apt update
+
+# Remove unnecessary packages - first hold the smaller versions
+apt-mark manual ubuntu-standard ros-foxy-ros-base libboost-all-dev
+snap remove gnome-3-34-1804 gtk-common-themes snap-store && snap remove core18 && snap remove snapd
+apt purge -y ubuntu-desktop ubuntu-desktop-minimal ubuntu-wallpapers ros-foxy-desktop firefox-locale-en firefox fonts-indic gnome-shell gnome-keyring gnome-terminal gnome-control-center language-pack-gnome-en-base wbritish wamerican mplayer hplip gvfs snapd
+
+echo -e -n "\nRemove redundant packages\n"
+apt autoremove -y --purge
 
 # Update Ubuntu
-echo -e -n "\nUpdating Ubuntu packages\n"
-sudo apt-get update
-sudo apt-get upgrade -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::='--force-confold' -y
+apt upgrade -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::='--force-confold' -y
 
-# Update DeepRacer
-echo -e -n "\nUpdate DeepRacer packages\n"
-sudo apt-get install aws-deepracer-* -y
-
-# Ensure all packages installed
-sudo apt-get update
-sudo apt-get upgrade -y
+# Additional packages
+apt install -y --no-install-recommends python3-websocket python3-click
 
 # Remove redundant packages
-echo -e -n "\nRemove redundant packages\n"
-sudo apt autoremove -y
+apt autoremove -y
+
+# Remove Swap
+swapoff -a
+sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+rm /swapfile
 
 # If changing hostname need to change the flag in network_config.py
 # /opt/aws/deepracer/lib/deepracer_systems_pkg/lib/python3.8/site-packages/deepracer_systems_pkg/network_monitor_module/network_config.py
@@ -126,24 +165,6 @@ cp $bundlePath/bundle.js ${backupDir}/bundle.js.bak
 rm $bundlePath/bundle.js
 cat ${backupDir}/bundle.js.bak | sed -e "s/isVideoPlaying\: true/isVideoPlaying\: false/" > $bundlePath/bundle.js
 
-# Disable system suspend
-echo -e -n "\nDisable system suspend\n"
-systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
-
-# Disable X on startup
-echo -e -n "\nSet console-only at startup\n"
-systemctl set-default multi-user.target
-
-# Disable network power saving
-echo -e -n "\nDisable network power saving"
-echo -e '#!/bin/sh\n/usr/sbin/iw dev mlan0 set power_save off\n' > /etc/network/if-up.d/disable_power_saving
-chmod 755 /etc/network/if-up.d/disable_power_saving
-
-# Enable SSH
-echo -e -n "\nEnable SSH\n"
-service ssh start
-ufw allow ssh
-
 # Allow multiple logins on the console
 echo -e -n "\nEnable multiple logins to the console\n"
 cp /etc/nginx/sites-enabled/default ${backupDir}/default.bak
@@ -156,51 +177,28 @@ cp $webserverPath/login.py ${backupDir}/login.py.bak
 rm $webserverPath/login.py
 cat ${backupDir}/login.py.bak | sed -e "s/datetime.timedelta(hours=1)/datetime.timedelta(hours=12)/" > $webserverPath/login.py
 
-# Disable Gnome and other services
-# - to enable gnome - systemctl set-default graphical
-# - to start gnome -  systemctl start gdm3
-systemctl set-default multi-user
-systemctl stop bluetooth
-systemctl stop cups-browsed
-
 # Default running service list
 # service --status-all | grep '\[ + \]'
-#  [ + ]  acpid
 #  [ + ]  alsa-utils
 #  [ + ]  apparmor
-#  [ + ]  apport
 #  [ + ]  avahi-daemon
-#  [ + ]  binfmt-support
-#  [ + ]  bluetooth
-#  [ + ]  console-setup
 #  [ + ]  cron
-#  [ + ]  cups-browsed
 #  [ + ]  dbus
 #  [ + ]  dnsmasq
 #  [ + ]  fail2ban
-#  [ + ]  grub-common
 #  [ + ]  irqbalance
 #  [ + ]  isc-dhcp-server
-#  [ + ]  keyboard-setup
 #  [ + ]  kmod
-#  [ + ]  lightdm
 #  [ + ]  network-manager
-#  [ + ]  networking
 #  [ + ]  nginx
-#  [ + ]  ondemand
 #  [ + ]  procps
-#  [ + ]  rc.local
-#  [ + ]  resolvconf
 #  [ + ]  rsyslog
-#  [ + ]  speech-dispatcher
 #  [ + ]  ssh
-#  [ + ]  thermald
+#  [ + ]  system-init
 #  [ + ]  udev
 #  [ + ]  ufw
-#  [ + ]  urandom
 #  [ + ]  uuidd
-#  [ + ]  watchdog
-#  [ + ]  whoopsie
+#  [ + ]  wd_keepalive
 
 # Restart services
 echo 'Restarting services'
